@@ -68,6 +68,10 @@ todo_client_lb_1    consul-template -config=/t ...   Up      192.168.99.124:1936
 
 In order to verify that the scaling worked and that all the new instances are reachable via the application load balancer, use the Haproxy stats screen in port 1936 (user someuser, password) of your client or backend load balancer. Sending a few requests should update the statistics for each one of the backend nodes.
 
+# Deploying to Amazon AWS
+
+If the Swarm cluster is running in AWS, the application will be automatically deployed there.
+
 # Known issues
 
 - Deleting or marking TODOs as completed does not currently work (adding new TODOs works just fine)

@@ -29,7 +29,17 @@ Checkout and install with ./start.sh. (Should write a singleliner for this)
 
 ## Setting up in AWS
 
-At the moment the AMI image name for the Ubuntu 15.10 image is hardcoded as ami-fe001292. This needs to be changed to be more easily configurable.
+Set the following environment variables with your AWS secrets before running the start.sh script:
+
+```
+export AWS_ACCESS_KEY_ID=<secret key>
+export AWS_SECRET_ACCESS_KEY=<secret access key>
+export AWS_VPC_ID=<vpc-id>
+export AWS_DEFAULT_REGION=eu-central-1a
+export AWS_ZONE=eu-central-1a
+```
+
+Please note that at the moment the AMI image name for the Ubuntu 15.10 image is hardcoded as ami-fe001292. This needs to be changed to be more easily configurable.
 
 ## Displaying important addresses
 
@@ -53,3 +63,4 @@ See README.md under apps/todo/ for more information.
 - The application load balancer container will sometimes fail to reload the list of nodes 
 - Can't mark TODOs for completion or delete them
 - The Registrator container is currently an unofficial fork that implements an unmerged PR to support overlay internal IP addresses for containers, as opposed to host IP addresses. This is fine for now but we should keep an eye on upstream Registrator and switch back to it when the PR is merged.
+-
