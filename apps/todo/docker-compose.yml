@@ -1,0 +1,99 @@
+#
+# Starts the application container as well as the MongoDB backend. This compose file is designed for running
+# on VirtualBox.
+#
+mongo:  
+ image: mongo:3.1
+ net: tldr-overlay
+ dns: 172.17.0.1
+ container_name: mongo
+ labels:
+  - "tldr.type=db"
+  - "tldr.app=todo"
+ environment:
+  # Sadly, we have to repeat some of the information since container labels are not available for registrator in consul
+  - "SERVICE_NAME=todo_db"
+  - "SERVICE_TAGS=tldr_type:db,tldr_app:todo"
+
+#
+# Backend service
+#
+# docker run -d -e SERVICE_NAME=$1 -e SERVICE_TAGS=rest --dns 172.17.0.1 --net tldr-overlay $NAME
+# 
+backend:
+ image: tldr/todo-backend:latest
+ dns: 172.17.0.1
+ net: tldr-overlay  
+ ports: 
+  - 8080
+ labels:
+  - "tldr.type=rest"
+  - "tldr.app=todo"  
+ environment:
+  - "MONGO_URL=mongo:27017"
+  - "SERVICE_NAME=todo_backend"
+  - "SERVICE_TAGS=tldr_type:rest,tldr_app:todo"
+
+#
+# Backend load balancer. Proxies requests to the backend services so that we it can be scaled up and down.
+# LBs use environment variable TLDR_LB_SERVICE_NAME to determine which service/application they're load
+# balancing for.
+#
+backend_lb:
+ image: tldr/alb:latest
+ dns: 172.17.0.1
+ net: tldr-overlay
+ labels:
+  - "tldr.type=lb"
+  - "tldr.app=todo" 
+  - "tldr.lb.service.name=todo_backend"
+ environment:
+  - "SERVICE_TAGS=tldr_type:lb,tldr_app:todo"
+  - "SERVICE_NAME=todo_backend_lb"
+  - "TLDR_LB_SERVICE_NAME=todo_backend"
+ ports:
+  - 80:80
+  - 1936:1936
+ command:
+  "-consul=tldr-swarm-0-consul:8500"
+
+# 
+# Frontend load balancer
+#
+client_lb:
+ image: tldr/alb:latest
+ net: tldr-overlay
+ dns: 172.17.0.1
+ labels:
+  - "tldr.type=lb"
+  - "tldr.app=todo"
+  - "tldr.lb.service.name=todo_client-80" 
+ environment:
+  - "SERVICE_TAGS=tldr_type:lb,tldr_app:todo"
+  - "SERVICE_NAME=todo_client_lb"
+  - "TLDR_LB_SERVICE_NAME=todo_client-80"
+ ports:
+  - 80:80
+  - 1936:1936
+ command:
+  "-consul=tldr-swarm-0-consul:8500"
+
+#
+# Frontend nginx
+#
+client:
+ net: tldr-overlay
+ dns: 172.17.0.1 
+ image: tldr/todo-client:latest
+ ports:
+  - 80
+ labels:
+  - "tldr.type=web"
+  - "tldr.app=todo"
+ environment:
+  - "BACKENDS=todo_backend_lb_1:80"
+  - "SERVICE_NAME=todo_client"
+  - "SERVICE_TAGS=tldr_type:web,tldr_app:todo"
+ # big hack - sometimes, the 'backend' host is not ready in this container and nginx fails to start
+ # See https://github.com/docker/compose/issues/374, might help if and when one of the solutions there gets implemented
+ command: sh -c "sleep 5 && /run.sh"
