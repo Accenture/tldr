@@ -35,6 +35,7 @@ resource "aws_subnet" "tldr-subnet-1" {
     }
 }
 
+
 resource "aws_route_table" "tldr-route-table" {
     vpc_id = "${aws_vpc.tldr-vpc.id}"
     
@@ -46,4 +47,10 @@ resource "aws_route_table" "tldr-route-table" {
     tags {
         Name = "tldr-route-table"
     }
+}
+
+# No inbound traffic from the internet will reach our instance without this
+resource "aws_main_route_table_association" "tldr-main_route_table_association" {
+    vpc_id = "${aws_vpc.tldr-vpc.id}"
+    route_table_id = "${aws_route_table.tldr-route-table.id}"
 }
