@@ -44,10 +44,6 @@ print "Fetching registrator image"
 docker pull kidibox/registrator
 docker tag kidibox/registrator $REGISTRY_IP/registrator
 docker push $REGISTRY_IP/registrator
-print "Fetching haproxy image to private registry"
-docker pull sirile/haproxy
-docker tag sirile/haproxy $REGISTRY_IP/haproxy
-docker push $REGISTRY_IP/haproxy
 print "Fetching minilogbox image to private registry"
 docker pull sirile/minilogbox
 docker tag sirile/minilogbox $REGISTRY_IP/minilogbox
