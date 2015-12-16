@@ -1,27 +1,34 @@
 #!/bin/bash
 
-
 source $(dirname ${BASH_SOURCE[0]})/docker-functions.sh
 source $(dirname ${BASH_SOURCE[0]})/nodeNames.sh
 
-if [ $AWS_ACCESS_KEY_ID ]; then
-  # Check that the machine doesn't already exist
-  if ! docker-machine inspect $REGISTRY_MACHINE_NAME-aws &> /dev/null; then
+if [ isAWS ]; then
+  if ! docker-machine status $REGISTRY_MACHINE_NAME &> /dev/null; then
     print "Creating private registry server on AWS"
-    docker-machine create --driver amazonec2 $REGISTRY_MACHINE_NAME-aws
-    REGISTRY_IP=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME-aws):5000
+    docker-machine create --driver amazonec2 $REGISTRY_MACHINE_NAME
+    if [ $? -ne 0 ]; then
+      error "There was a problem creating the node."
+      exit 1
+    fi
+
+    REGISTRY_IP=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
     # Modify the registry to be insecure
-    docker-machine ssh $REGISTRY_MACHINE_NAME-aws "echo $'DOCKER_OPTS=\"\$DOCKER_OPTS --insecure-registry='$REGISTRY_IP'\"' | sudo tee -a /etc/default/docker && sudo service docker restart"
-    docker $(docker-machine config $REGISTRY_MACHINE_NAME-aws) run -d -p 5000:5000 --restart=always --name registry registry:2
+    docker-machine ssh $REGISTRY_MACHINE_NAME "echo $'DOCKER_OPTS=\"\$DOCKER_OPTS --insecure-registry='$REGISTRY_IP'\"' | sudo tee -a /etc/default/docker && sudo service docker restart"
+    docker $(docker-machine config $REGISTRY_MACHINE_NAME) run -d -p 5000:5000 --restart=always --name registry registry:2
   else
-    REGISTRY_IP=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME-aws):5000
+    REGISTRY_IP=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
   fi
-  eval $(docker-machine env $REGISTRY_MACHINE_NAME-aws)
+  eval $(docker-machine env $REGISTRY_MACHINE_NAME)
 else
-  # Check that the machine doesn't already exist
-  if ! docker-machine inspect $REGISTRY_MACHINE_NAME &> /dev/null; then
+  if ! docker-machine status $REGISTRY_MACHINE_NAME &> /dev/null; then
     print "Creating local private registry server"
     docker-machine create --driver virtualbox --virtualbox-memory 2048 $REGISTRY_MACHINE_NAME
+    if [ $? -ne 0 ]; then
+      error "There was a problem creating the node."
+      exit 1
+    fi
+
     REGISTRY_IP=$(docker-machine ip $REGISTRY_MACHINE_NAME):5000
     docker-machine ssh $REGISTRY_MACHINE_NAME "echo $'EXTRA_ARGS=\"--insecure-registry '$REGISTRY_IP'\"' | sudo tee -a /var/lib/boot2docker/profile && sudo /etc/init.d/docker restart"
     docker $(docker-machine config $REGISTRY_MACHINE_NAME) run -d -p 5000:5000 --restart=always --name registry registry:2
@@ -44,10 +51,6 @@ print "Fetching registrator image"
 docker pull kidibox/registrator
 docker tag kidibox/registrator $REGISTRY_IP/registrator
 docker push $REGISTRY_IP/registrator
-print "Fetching haproxy image to private registry"
-docker pull sirile/haproxy
-docker tag sirile/haproxy $REGISTRY_IP/haproxy
-docker push $REGISTRY_IP/haproxy
 print "Fetching minilogbox image to private registry"
 docker pull sirile/minilogbox
 docker tag sirile/minilogbox $REGISTRY_IP/minilogbox

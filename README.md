@@ -35,11 +35,18 @@ Set the following environment variables with your AWS secrets before running the
 export AWS_ACCESS_KEY_ID=<secret key>
 export AWS_SECRET_ACCESS_KEY=<secret access key>
 export AWS_VPC_ID=<vpc-id>
-export AWS_DEFAULT_REGION=eu-central-1a
-export AWS_ZONE=eu-central-1a
+export AWS_ZONE=<zone, one of a, b, c, d or e>
+export AWS_SUBNET_ID=<subnet-id>
 ```
 
 Please note that at the moment the AMI image name for the Ubuntu 15.10 image is hardcoded as ami-fe001292. This needs to be changed to be more easily configurable.
+
+Additinoally, teh following environment variables can be used to override some of the default values used for EC2 instances:
+
+```
+AWS_INSTANCE_TYPE=t2.micro
+AWS_ROOT_SIZE=16
+```
 
 ## Displaying important addresses
 
@@ -56,6 +63,7 @@ See README.md under apps/todo/ for more information.
 - Migrate from Logspout to Docker logging via syslog
 - Create a separate network for the application containers
 - Better demo applications
+- Do not run with an insecure registry
 
 # Known issues
 

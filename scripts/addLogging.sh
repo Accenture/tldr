@@ -2,13 +2,13 @@
 source $(dirname ${BASH_SOURCE[0]})/docker-functions.sh
 source $(dirname ${BASH_SOURCE[0]})/nodeNames.sh
 
-if [ $AWS_ACCESS_KEY_ID ]; then
-  REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME-aws):5000
-  ELASTICSEARCH=http://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME-aws):9200
-  LOGSTASH=syslog://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME-aws):5000
+if [ isAWS ]; then
+  REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
+  ELASTICSEARCH=http://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):9200
+  LOGSTASH=syslog://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):5000
   SWARM_MEMBERS=$(docker-machine ls | grep 'swarm-.-aws' | awk '{print $1}' | xargs)
-  KIBANA=http://$(docker-machine ip $INFRA_MACHINE_NAME-aws):5601
-  eval $(docker-machine env $INFRA_MACHINE_NAME-aws)
+  KIBANA=http://$(docker-machine ip $INFRA_MACHINE_NAME):5601
+  eval $(docker-machine env $INFRA_MACHINE_NAME)
 else
   REGISTRY=$(docker-machine ip $REGISTRY_MACHINE_NAME):5000
   ELASTICSEARCH=http://$(docker-machine ip $INFRA_MACHINE_NAME):9200

@@ -39,3 +39,22 @@ function checkNode() {
 function print() {
   printf "\e[33m*** \e[32m$1 \e[33m***\e[0m\n"
 }
+
+function error() {
+  printf "\e[31mERROR: $1\e[0m\n"
+}
+
+function checkAWSData() {
+  if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_VPC_ID" == "" || "$AWS_SUBNET_ID" == "" || "$AWS_ZONE" == "" ]]; then
+    echo "Please set environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_VPC_ID and AWS_SUBNET_ID for the Amazon AWS configuration".
+    exit 1
+  fi
+}
+
+function isAWS() {
+  if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_VPC_ID" == "" || "$AWS_SUBNET_ID" == "" || "$AWS_ZONE" == "" ]]; then
+    return false
+  else
+    return true
+  fi
+}
