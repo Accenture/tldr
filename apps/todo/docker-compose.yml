@@ -5,7 +5,7 @@
 mongo:  
  image: mongo:3.1
  net: tldr-overlay
- dns: 172.17.0.1
+ dns: ["172.17.0.1"]
  container_name: mongo
  labels:
   - "tldr.type=db"
@@ -22,7 +22,7 @@ mongo:
 # 
 backend:
  image: tldr/todo-backend:latest
- dns: 172.17.0.1
+ dns: ["172.17.0.1"]
  net: tldr-overlay  
  ports: 
   - 8080
@@ -43,7 +43,7 @@ backend:
 #
 backend_lb:
  image: tldr/alb:latest
- dns: 172.17.0.1
+ dns: ["172.17.0.1"]
  net: tldr-overlay
  labels:
   - "tldr.type=lb"
@@ -65,7 +65,7 @@ backend_lb:
 client_lb:
  image: tldr/alb:latest
  net: tldr-overlay
- dns: 172.17.0.1
+ dns: ["172.17.0.1"]
  labels:
   - "tldr.type=lb"
   - "tldr.app=todo"
@@ -85,7 +85,7 @@ client_lb:
 #
 client:
  net: tldr-overlay
- dns: 172.17.0.1 
+ dns: ["172.17.0.1"]
  image: tldr/todo-client:latest
  ports:
   - 80
