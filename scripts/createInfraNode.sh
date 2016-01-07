@@ -9,7 +9,7 @@ if [ isAWS ]; then
   REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
   if ! docker-machine inspect $INFRA_MACHINE_NAME &> /dev/null; then
     print "Creating infra node into AWS"
-    docker-machine create -d amazonec2 --engine-insecure-registry=$REGISTRY $INFRA_MACHINE_NAME
+    docker-machine create -d amazonec2 --amazonec2-security-group $TLDR_NODE_SG_NAME --engine-insecure-registry=$REGISTRY $INFRA_MACHINE_NAME
   fi
   eval $(docker-machine env $INFRA_MACHINE_NAME)
 else

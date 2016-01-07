@@ -54,3 +54,80 @@ resource "aws_main_route_table_association" "tldr-main_route_table_association" 
     vpc_id = "${aws_vpc.tldr-vpc.id}"
     route_table_id = "${aws_route_table.tldr-route-table.id}"
 }
+
+# Security group for Docker Machine nodes
+resource "aws_security_group" "tldr-node" {
+  name = "tldr-node"
+  description = "Security group for TLDR nodes"
+  vpc_id = "${aws_vpc.tldr-vpc.id}"
+
+  # ssh
+  ingress {
+      from_port = 22
+      to_port = 22
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+ # docker daemon
+ ingress {
+      from_port = 2376
+      to_port = 2376
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # allow all outbound traffic
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name = "tldr-node"
+  }
+}
+
+resource "aws_security_group" "tldr-registry" {
+  name = "tldr-registry"
+  description = "Security group for TLDR nodes"
+  vpc_id = "${aws_vpc.tldr-vpc.id}"
+
+  # ssh
+  ingress {
+      from_port = 22
+      to_port = 22
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # docker daemon
+  ingress {
+      from_port = 2376
+      to_port = 2376
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  } 
+
+  # registry port
+  ingress {
+    from_port = 5000
+    to_port = 5000
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # allow all outbound traffic
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name = "tldr-registry"
+  }
+}
