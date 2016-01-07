@@ -25,15 +25,15 @@ The following are needed to get this environment running:
 
 ## Setting up locally
 
-Checkout and install with ./start.sh. (Should write a singleliner for this)
+Use script ```start.sh``` to set up the Docker Swarm platform and technical components. The process should take approximately 10 minutes, depending on the specs of your host machine as well as the speed of your network connection (several containers will be pulled from the Docker Hub, and cached locally).
+
+Once the process is complete, run ``ìnfo.sh``` to provide a list of the available endpoints for inspection.
+
+See apps/todo/README.md for deploying the To-Do demo application.
 
 ## Setting up in AWS
 
-At the moment the AMI image name for the Ubuntu 15.10 image is hardcoded as ami-fe001292. This needs to be changed to be more easily configurable.
-
-## Displaying important addresses
-
-Use `./info.sh` you can display the used endpoints.
+Support for setting the platform up on AWS is currently in progress.
 
 # Reference application
 
