@@ -27,7 +27,7 @@ The following are needed to get this environment running:
 
 Use script ```start.sh``` to set up the Docker Swarm platform and technical components. The process should take approximately 10 minutes, depending on the specs of your host machine as well as the speed of your network connection (several containers will be pulled from the Docker Hub, and cached locally).
 
-Once the process is complete, run ``ìnfo.sh``` to provide a list of the available endpoints for inspection.
+Once the process is complete, run ```info.sh``` to provide a list of the available endpoints for inspection.
 
 See apps/todo/README.md for deploying the To-Do demo application.
 
