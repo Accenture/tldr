@@ -77,6 +77,14 @@ resource "aws_security_group" "tldr-node" {
       cidr_blocks = ["0.0.0.0/0"]
   }
 
+ # Consul
+ ingress {
+      from_port = 8500
+      to_port = 8500
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }  
+
   # allow all outbound traffic
   egress {
     from_port = 0
@@ -87,6 +95,49 @@ resource "aws_security_group" "tldr-node" {
 
   tags {
     Name = "tldr-node"
+  }
+}
+
+# Security group for the infra node
+resource "aws_security_group" "tldr-infra-node" {
+  name = "tldr-infra-node"
+  description = "Security group for TLDR infra node"
+  vpc_id = "${aws_vpc.tldr-vpc.id}"
+
+  # ssh
+  ingress {
+      from_port = 22
+      to_port = 22
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+ # docker daemon
+ ingress {
+      from_port = 2376
+      to_port = 2376
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+ # Consul
+ ingress {
+      from_port = 8500
+      to_port = 8500
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # allow all outbound traffic
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name = "tldr-infra-node"
   }
 }
 

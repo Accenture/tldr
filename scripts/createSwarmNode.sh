@@ -15,7 +15,11 @@ if [ isAWS ]; then
     NAME="$SWARM_MACHINE_NAME_PREFIX-0"
     if ! docker-machine inspect $NAME &> /dev/null; then
       print "Creating swarm master with the name '$NAME' to AWS"
-      docker-machine create -d amazonec2 --swarm --swarm-master --swarm-discovery consul://$CONSUL:8500 --engine-opt="cluster-store=consul://$CONSUL:8500" --amazonec2-ami=ami-fe001292 --engine-opt="cluster-advertise=eth0:2376" $OPTIONS --swarm-image $REGISTRY/swarm --engine-insecure-registry=$REGISTRY $NAME
+      docker-machine create -d amazonec2 \
+        --swarm --swarm-master --swarm-discovery="consul://$CONSUL:8500" \
+        --engine-opt="cluster-store=consul://$CONSUL:8500" --engine-insecure-registry="$REGISTRY" \
+        --engine-opt="cluster-advertise=eth0:2376" $OPTIONS --swarm-image $REGISTRY/swarm \
+        --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" --amazonec2-security-group="$TLDR_NODE_SG_NAME" $NAME
       print "Creating network tldr-overlay"
       docker $(docker-machine config $NAME) network create --driver overlay tldr-overlay
       print "Starting master consul"
@@ -30,7 +34,10 @@ if [ isAWS ]; then
     OVERLAY_CONSUL=$(docker $(docker-machine config $SWARM_MACHINE_NAME_PREFIX-0) inspect -f '{{(index .NetworkSettings.Networks "tldr-overlay").IPAddress}}' tldr-swarm-0-aws-consul)
     if ! docker-machine inspect $NAME &> /dev/null; then
       print "Creating swarm node with the name '$NAME' to AWS, label: $2"
-      docker-machine create --driver amazonec2 --swarm --swarm-discovery consul://$CONSUL:8500 --engine-opt="cluster-store=consul://$CONSUL:8500" --amazonec2-ami=ami-fe001292 --engine-opt="cluster-advertise=eth0:2376" $OPTIONS --engine-insecure-registry=$REGISTRY $NAME
+      docker-machine create --driver amazonec2 \
+         --swarm --swarm-discovery="consul://$CONSUL:8500" \
+         --engine-opt="cluster-store=consul://$CONSUL:8500" --engine-opt="cluster-advertise=eth0:2376" $OPTIONS --engine-insecure-registry="$REGISTRY" \
+         --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" --amazonec2-security-group="$TLDR_NODE_SG_NAME" $NAME
       print "Starting slave consul"
       docker $(docker-machine config $NAME) run -d -p 172.17.0.1:53:53 -p 172.17.0.1:53:53/udp -p 8500:8500 --name $NAME-consul --net tldr-overlay $REGISTRY/consul -join $OVERLAY_CONSUL
     else

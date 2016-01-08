@@ -18,7 +18,8 @@ This is the first draft of a custom Docker based runtime to support 3-tier state
 
 The following are needed to get this environment running:
 
-- Docker Toolbox 1.9
+- Docker Toolbox 1.9.1
+- Docker Machine 0.5.2 or higher (please note that this is not currently part of the Docker Toolbox package!). Get the latest version from here: https://github.com/docker/machine/releases
 - Bash/Cygwin (not fully tested in Windows)
 
 # Usage
@@ -28,6 +29,10 @@ The following are needed to get this environment running:
 Checkout and install with ./start.sh. (Should write a singleliner for this)
 
 ## Setting up in AWS
+
+Please note that Docker Machine 0.5.2 or higher is needed, or it won't work.
+
+AWS instances are 
 
 Set the following environment variables with your AWS secrets before running the start.sh script:
 
@@ -41,7 +46,7 @@ export AWS_SUBNET_ID=<subnet-id>
 
 Please note that at the moment the AMI image name for the Ubuntu 15.10 image is hardcoded as ami-fe001292. This needs to be changed to be more easily configurable.
 
-Additinoally, teh following environment variables can be used to override some of the default values used for EC2 instances:
+Additionally, teh following environment variables can be used to override some of the default values used for EC2 instances:
 
 ```
 AWS_INSTANCE_TYPE=t2.micro
