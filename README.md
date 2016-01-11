@@ -19,7 +19,7 @@ This is the first draft of a custom Docker based runtime to support 3-tier state
 The following are needed to get this environment running:
 
 - Docker Toolbox 1.9.1
-- Docker Machine 0.5.2 or higher (please note that this is not currently part of the Docker Toolbox package!). The latest version from  is available at https://github.com/docker/machine/releases, but version 0.5.5 seemed to crash when dealing with the configuration of security groups upon instance creation.
+- Docker Machine 0.5.2 or higher if you intend to deploy the platform to Amazon Web Services; the default version from Docker Toolbox 1.9.1 will work just fine with VirtualBox deploymnts but please note that 0.5.2 or higher are not currently part of the Docker Toolbox package!. The latest version from  is available at https://github.com/docker/machine/releases, but version 0.5.5 seemed to crash when dealing with the configuration of security groups upon instance creation.
 - Bash/Cygwin (not fully tested in Windows)
 
 # Usage
