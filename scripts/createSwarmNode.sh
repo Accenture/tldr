@@ -68,7 +68,7 @@ else
     OVERLAY_CONSUL=$(docker $(docker-machine config $SWARM_MACHINE_NAME_PREFIX-0) inspect -f '{{(index .NetworkSettings.Networks "tldr-overlay").IPAddress}}' tldr-swarm-0-consul)
     if ! docker-machine inspect $NAME &> /dev/null; then
       print "Creating swarm node with the name '$NAME' locally, label: $2"
-      docker-machine create --driver virtualbox --swarm --swarm-discovery consul://$CONSUL:8500 --engine-opt="cluster-store=consul://$CONSUL:8500" --engine-opt="cluster-advertise=eth1:2376" $OPTIONS --engine-insecure-registry=$REGISTRY $NAME
+      docker-machine create --driver virtualbox --swarm --swarm-discovery consul://$CONSUL:8500 --swarm-image $REGISTRY/swarm --engine-opt="cluster-store=consul://$CONSUL:8500" --engine-opt="cluster-advertise=eth1:2376" $OPTIONS --engine-insecure-registry=$REGISTRY $NAME
       print "Starting slave consul"
       docker $(docker-machine config $NAME) run -d -p 172.17.0.1:53:53 -p 172.17.0.1:53:53/udp -p 8500:8500 --name tldr-swarm-$1-consul --net tldr-overlay $REGISTRY/consul -join $OVERLAY_CONSUL
     else
