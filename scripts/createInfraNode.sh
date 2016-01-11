@@ -4,14 +4,14 @@ source $(dirname ${BASH_SOURCE[0]})/docker-functions.sh
 source $(dirname ${BASH_SOURCE[0]})/nodeNames.sh
 
 # Creates infra node if needed
-if [ $AWS_ACCESS_KEY_ID ]; then
+if [ isAWS ]; then
   # Check if the node already exists
-  REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME-aws):5000
-  if ! docker-machine inspect $INFRA_MACHINE_NAME-aws &> /dev/null; then
+  REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
+  if ! docker-machine inspect $INFRA_MACHINE_NAME &> /dev/null; then
     print "Creating infra node into AWS"
-    docker-machine create -d amazonec2 --engine-insecure-registry=$REGISTRY $INFRA_MACHINE_NAME-aws
+    docker-machine create -d amazonec2 --amazonec2-security-group $TLDR_INFRA_NODE_SG_NAME --engine-insecure-registry=$REGISTRY $INFRA_MACHINE_NAME
   fi
-  eval $(docker-machine env $INFRA_MACHINE_NAME-aws)
+  eval $(docker-machine env $INFRA_MACHINE_NAME)
 else
   REGISTRY=$(docker-machine ip $REGISTRY_MACHINE_NAME):5000
   if ! docker-machine inspect $INFRA_MACHINE_NAME &> /dev/null; then
