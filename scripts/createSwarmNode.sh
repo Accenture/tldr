@@ -17,6 +17,7 @@ if [ isAWS ]; then
       print "Creating swarm master with the name '$NAME' to AWS"
       docker-machine create -d amazonec2 \
         --swarm --swarm-master --swarm-discovery="consul://$CONSUL:8500" \
+        --swarm-image $REGISTRY/swarm \
         --engine-opt="cluster-store=consul://$CONSUL:8500" --engine-insecure-registry="$REGISTRY" \
         --engine-opt="cluster-advertise=eth0:2376" $OPTIONS --swarm-image $REGISTRY/swarm \
         --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" --amazonec2-security-group="$TLDR_NODE_SG_NAME" $NAME
@@ -36,6 +37,7 @@ if [ isAWS ]; then
       print "Creating swarm node with the name '$NAME' to AWS, label: $2"
       docker-machine create --driver amazonec2 \
          --swarm --swarm-discovery="consul://$CONSUL:8500" \
+         --swarm-image $REGISTRY/swarm \
          --engine-opt="cluster-store=consul://$CONSUL:8500" --engine-opt="cluster-advertise=eth0:2376" $OPTIONS --engine-insecure-registry="$REGISTRY" \
          --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" --amazonec2-security-group="$TLDR_NODE_SG_NAME" $NAME
       print "Starting slave consul"
