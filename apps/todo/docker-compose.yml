@@ -33,6 +33,8 @@ backend:
   - "MONGO_URL=mongo:27017"
   - "SERVICE_NAME=todo_backend"
   - "SERVICE_TAGS=tldr_type:rest,tldr_app:todo"
+  # scheduling constraint, so that these containers run only in the node marked as "application"
+  - "constraint:type==application"
 
 #
 # Backend load balancer. Proxies requests to the backend services so that we it can be scaled up and down.
@@ -94,6 +96,8 @@ client:
   - "BACKENDS=todo_backend_lb_1:80"
   - "SERVICE_NAME=todo_client"
   - "SERVICE_TAGS=tldr_type:web,tldr_app:todo"
+  # scheduling constraint, so that these containers run only in the node marked as "application"
+  - "constraint:type==frontend"
  # big hack - sometimes, the 'backend' host is not ready in this container and nginx fails to start
  # See https://github.com/docker/compose/issues/374, might help if and when one of the solutions there gets implemented
  command: sh -c "sleep 5 && /run.sh"
