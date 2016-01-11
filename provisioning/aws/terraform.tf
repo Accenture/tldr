@@ -77,6 +77,14 @@ resource "aws_security_group" "tldr-node" {
       cidr_blocks = ["0.0.0.0/0"]
   }
 
+ # Swarm master
+ ingress {
+      from_port = 3376
+      to_port = 3376
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }  
+
  # Consul
  ingress {
       from_port = 8500
@@ -84,6 +92,47 @@ resource "aws_security_group" "tldr-node" {
       protocol = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
   }  
+
+  # consul
+  ingress {
+    from_port = 7946
+    to_port = 7946
+    protocol = "tcp"
+    #security_groups = ["tldr-node"]
+    self = true
+  }
+
+  # allow all traffic within the security group
+  ingress {
+    from_port = 0
+    to_port = 0
+    self = true
+    protocol = "-1"
+  }
+
+  # load balancer/haproxy
+  ingress {
+      from_port = 80
+      to_port = 80
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+ # load balancer/haproxy - admin interface
+ ingress {
+      from_port = 1936
+      to_port = 1936
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # icmp
+  ingress {
+    from_port = -1
+    to_port = -1
+    protocol = "icmp"
+    self = true
+  }
 
   # allow all outbound traffic
   egress {
@@ -103,6 +152,14 @@ resource "aws_security_group" "tldr-infra-node" {
   name = "tldr-infra-node"
   description = "Security group for TLDR infra node"
   vpc_id = "${aws_vpc.tldr-vpc.id}"
+
+ # allow all traffic within the security group
+  ingress {
+    from_port = 0
+    to_port = 0
+    self = true
+    protocol = "-1"
+  }  
 
   # ssh
   ingress {
@@ -145,6 +202,14 @@ resource "aws_security_group" "tldr-registry" {
   name = "tldr-registry"
   description = "Security group for TLDR nodes"
   vpc_id = "${aws_vpc.tldr-vpc.id}"
+
+ # allow all traffic within the security group
+  ingress {
+    from_port = 0
+    to_port = 0
+    self = true
+    protocol = "-1"
+  }  
 
   # ssh
   ingress {
