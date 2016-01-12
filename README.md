@@ -70,4 +70,3 @@ See README.md under apps/todo/ for more information.
 
 - Can't mark TODOs for completion or delete them
 - The Registrator container is currently an unofficial fork that implements an unmerged PR to support overlay internal IP addresses for containers, as opposed to host IP addresses. This is fine for now but we should keep an eye on upstream Registrator and switch back to it when the PR is merged.
--
