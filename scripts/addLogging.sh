@@ -6,24 +6,24 @@ if [ isAWS ]; then
   REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
   ELASTICSEARCH=http://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):9200
   LOGSTASH=syslog://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):5000
-  SWARM_MEMBERS=$(docker-machine ls | grep 'swarm-.-aws' | awk '{print $1}' | xargs)
+  SWARM_MEMBERS=$(docker-machine ls | grep 'swarm-aws-.' | awk '{print $1}' | xargs)
   KIBANA=http://$(docker-machine ip $INFRA_MACHINE_NAME):5601
-  eval $(docker-machine env $INFRA_MACHINE_NAME)
 else
   REGISTRY=$(docker-machine ip $REGISTRY_MACHINE_NAME):5000
   ELASTICSEARCH=http://$(docker-machine ip $INFRA_MACHINE_NAME):9200
   LOGSTASH=syslog://$(docker-machine ip $INFRA_MACHINE_NAME):5000
   SWARM_MEMBERS=$(docker-machine ls | grep 'swarm-.[ ]' | awk '{print $1}' | xargs)
   KIBANA=http://$(docker-machine ip $INFRA_MACHINE_NAME):5601
-  eval $(docker-machine env $INFRA_MACHINE_NAME)
 fi
 
+eval $(docker-machine env $INFRA_MACHINE_NAME)
+
 if ! docker inspect logbox &> /dev/null; then
-  print "Starting LogBox"
-  docker run -d --name logbox -h logbox -p 5000:5000/udp -p 9200:9200 $REGISTRY/minilogbox
-  docker run -d -p 5601:5601 -h kibanabox --name kibanabox $REGISTRY/kibanabox $ELASTICSEARCH
+  print "Starting ElasticSearch and Logstash container"
+  docker run -d --name logbox -h logbox -p 5000:5000/udp -p 9200:9200 $REGISTRY/logbox
+  docker run -d -p 5601:5601 -h kibana --name kibana $REGISTRY/kibanabox $ELASTICSEARCH
 else
-  print "LogBox already running\e[33m***\e[0m\n"
+  print "ElasticSearch and Logstash container already running\e[33m***\e[0m\n"
 fi
 
 print "Servers in the swarm: $SWARM_MEMBERS"

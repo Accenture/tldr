@@ -51,17 +51,17 @@ print "Fetching registrator image"
 docker pull kidibox/registrator
 docker tag kidibox/registrator $REGISTRY_IP/registrator
 docker push $REGISTRY_IP/registrator
-print "Fetching minilogbox image to private registry"
-docker pull sirile/minilogbox
-docker tag sirile/minilogbox $REGISTRY_IP/minilogbox
-docker push $REGISTRY_IP/minilogbox
-print "Fetching kibanabox image to private registry"
-docker pull sirile/kibanabox
-docker tag sirile/kibanabox $REGISTRY_IP/kibanabox
-docker push $REGISTRY_IP/kibanabox
+print "Fetching logbox image to private registry"
+docker pull tldr/logbox
+docker tag tldr/logbox $REGISTRY_IP/logbox
+docker push $REGISTRY_IP/logbox
+print "Fetching Kibana image to private registry"
+docker pull tldr/kibana
+docker tag tldr/kibana $REGISTRY_IP/kibana
+docker push $REGISTRY_IP/kibana
 print "Fetching logspout image to private registry"
-docker pull progrium/logspout
-docker tag progrium/logspout $REGISTRY_IP/logspout
+docker pull gliderlabs/logspout
+docker tag gliderlabs/logspout $REGISTRY_IP/logspout
 docker push $REGISTRY_IP/logspout
 print "Fetching prometheus image to private registry"
 docker pull prom/prometheus
