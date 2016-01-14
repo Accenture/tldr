@@ -18,19 +18,32 @@ fi
 
 eval $(docker-machine env $INFRA_MACHINE_NAME)
 
-if ! docker inspect logbox &> /dev/null; then
-  print "Starting ElasticSearch and Logstash container"
-  docker run -d --name logbox -h logbox -p 5000:5000/udp -p 9200:9200 $REGISTRY/logbox
-  docker run -d -p 5601:5601 -h kibana --name kibana $REGISTRY/kibanabox $ELASTICSEARCH
+if ! docker inspect elasticsearch &> /dev/null; then
+  print "Starting ElasticSearch"
+  docker run -d --name elasticsearch -h elasticsearch -p 9300:9300 -p 9200:9200 $REGISTRY/tldr/elasticsearch
 else
-  print "ElasticSearch and Logstash container already running\e[33m***\e[0m\n"
+  print "ElasticSearch container already running\e[33m***\e[0m\n"
+fi
+
+if ! docker inspect logstash &> /dev/null; then
+  print "Starting Logstash"
+  docker run -d --name logstash -h logstash -p 5000:5000/udp -p 5000:5000 --link elasticsearch $REGISTRY/tldr/logstash
+else
+  print "Logstash container already running\e[33m***\e[0m\n"
+fi
+
+if ! docker inspect kibana &> /dev/null; then
+  print "Starting Kibana"
+  docker run -d --name kibana -h kibana -p 5601:5601 --link elasticsearch $REGISTRY/tldr/kibana
+else
+  print "Kibana container already running\e[33m***\e[0m\n"
 fi
 
 print "Servers in the swarm: $SWARM_MEMBERS"
 for server in $SWARM_MEMBERS; do
   if ! docker $(docker-machine config $server) inspect logspout &> /dev/null; then
     print "Starting logspout on $server"
-    docker $(docker-machine config $server) run -d --name $server-logspout -h logspout -p 8100:8000 -v /var/run/docker.sock:/tmp/docker.sock $REGISTRY/logspout $LOGSTASH
+    docker $(docker-machine config $server) run -d --name $server-logspout -h logspout -p 8100:8000 -v /var/run/docker.sock:/tmp/docker.sock $REGISTRY/tldr/logspout $LOGSTASH
   else
     print "Logspout already running on $server"
   fi

@@ -38,36 +38,49 @@ else
   eval $(docker-machine env $REGISTRY_MACHINE_NAME)
 fi
 # Pull the images to the registry machine, tag them and push to private registry
-print "Fetching images to private registry"
-print "Fetching consul image"
+print "Caching images in the private registry"
+
+print "Caching Consul image"
 docker pull progrium/consul
 docker tag progrium/consul $REGISTRY_IP/consul
 docker push $REGISTRY_IP/consul
-print "Fetching swarm image"
+
+print "Caching Swarm image"
 docker pull swarm:latest
 docker tag swarm:latest $REGISTRY_IP/swarm
 docker push $REGISTRY_IP/swarm
-print "Fetching registrator image"
+
+print "Caching Registrator image"
 docker pull kidibox/registrator
 docker tag kidibox/registrator $REGISTRY_IP/registrator
 docker push $REGISTRY_IP/registrator
-print "Fetching logbox image to private registry"
-docker pull tldr/logbox
-docker tag tldr/logbox $REGISTRY_IP/logbox
-docker push $REGISTRY_IP/logbox
-print "Fetching Kibana image to private registry"
+
+print "Caching ElasticSearch image"
+docker pull tldr/elasticsearch
+docker tag tldr/elasticsearch $REGISTRY_IP/tldr/elasticsearch
+docker push $REGISTRY_IP/tldr/elasticsearch
+
+print "Caching Kibana image"
 docker pull tldr/kibana
-docker tag tldr/kibana $REGISTRY_IP/kibana
-docker push $REGISTRY_IP/kibana
-print "Fetching logspout image to private registry"
-docker pull gliderlabs/logspout
-docker tag gliderlabs/logspout $REGISTRY_IP/logspout
-docker push $REGISTRY_IP/logspout
-print "Fetching prometheus image to private registry"
+docker tag tldr/kibana $REGISTRY_IP/tldr/kibana
+docker push $REGISTRY_IP/tldr/kibana
+
+print "Caching Logspout image"
+docker pull tldr/logspout
+docker tag tldr/logspout $REGISTRY_IP/tldr/logspout
+docker push $REGISTRY_IP/tldr/logspout
+
+print "Caching Logstash image"
+docker pull tldr/logstash
+docker tag tldr/logstash $REGISTRY_IP/tldr/logstash
+docker push $REGISTRY_IP/tldr/logstash
+
+print "Caching Prometheus image"
 docker pull prom/prometheus
 docker tag prom/prometheus $REGISTRY_IP/prometheus
 docker push $REGISTRY_IP/prometheus
-print "Fetching cadvisor image to private registry"
+
+print "Caching cAdvisor image"
 docker pull google/cadvisor:latest
 docker tag google/cadvisor:latest $REGISTRY_IP/cadvisor
 docker push $REGISTRY_IP/cadvisor
