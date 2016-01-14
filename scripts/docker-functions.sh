@@ -53,8 +53,8 @@ function checkAWSData() {
 
 function isAWS() {
   if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_VPC_ID" == "" || "$AWS_SUBNET_ID" == "" || "$AWS_ZONE" == "" ]]; then
-    return false
+    return 1 #false 
   else
-    return true
+    return 0 #true
   fi
 }

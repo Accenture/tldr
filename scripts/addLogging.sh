@@ -2,7 +2,7 @@
 source $(dirname ${BASH_SOURCE[0]})/docker-functions.sh
 source $(dirname ${BASH_SOURCE[0]})/nodeNames.sh
 
-if [ isAWS ]; then
+if isAWS; then
   REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
   ELASTICSEARCH=http://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):9200
   LOGSTASH=syslog://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):5000

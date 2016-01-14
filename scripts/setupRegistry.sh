@@ -3,7 +3,10 @@
 source $(dirname ${BASH_SOURCE[0]})/docker-functions.sh
 source $(dirname ${BASH_SOURCE[0]})/nodeNames.sh
 
-if [ isAWS ]; then
+
+echo registry name is $REGISTRY_MACHINE_NAME
+
+if isAWS; then
   if ! docker-machine status $REGISTRY_MACHINE_NAME &> /dev/null; then
     print "Creating private registry server on AWS"
     docker-machine create --driver amazonec2 --amazonec2-security-group $TLDR_REGISTRY_SG_NAME $REGISTRY_MACHINE_NAME

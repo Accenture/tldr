@@ -2,7 +2,7 @@
 
 source $(dirname ${BASH_SOURCE[0]})/docker-functions.sh
 
-if [ isAWS ]; then
+if isAWS; then
 	REGISTRY_MACHINE_NAME="tldr-registry-aws"
 	INFRA_MACHINE_NAME="tldr-infra-aws"
 	SWARM_MACHINE_NAME_PREFIX="tldr-swarm-aws"

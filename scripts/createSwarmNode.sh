@@ -8,7 +8,7 @@ source $(dirname ${BASH_SOURCE[0]})/nodeNames.sh
 
 [ $2 ] && OPTIONS="--engine-label=\"type=$2\""
 
-if [ isAWS ]; then
+if isAWS; then
   CONSUL=$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME)
   REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
   if [ $1 -eq 0 ]; then

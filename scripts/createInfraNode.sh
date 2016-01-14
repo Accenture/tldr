@@ -4,7 +4,7 @@ source $(dirname ${BASH_SOURCE[0]})/docker-functions.sh
 source $(dirname ${BASH_SOURCE[0]})/nodeNames.sh
 
 # Creates infra node if needed
-if [ isAWS ]; then
+if isAWS; then
   # Check if the node already exists
   REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
   if ! docker-machine inspect $INFRA_MACHINE_NAME &> /dev/null; then
