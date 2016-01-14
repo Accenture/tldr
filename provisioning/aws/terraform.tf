@@ -185,6 +185,21 @@ resource "aws_security_group" "tldr-infra-node" {
       cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Kibana
+  ingress {
+    from_port = 5601
+    to_port = 5601
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 5000
+    to_port = 5000
+    protocol = "udp"
+    security_groups = [ "${aws_security_group.tldr-node.id}" ]
+  }
+
   # allow all outbound traffic
   egress {
     from_port = 0

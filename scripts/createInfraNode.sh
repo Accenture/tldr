@@ -9,7 +9,11 @@ if [ isAWS ]; then
   REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
   if ! docker-machine inspect $INFRA_MACHINE_NAME &> /dev/null; then
     print "Creating infra node into AWS"
-    docker-machine create -d amazonec2 --amazonec2-security-group $TLDR_INFRA_NODE_SG_NAME --engine-insecure-registry=$REGISTRY $INFRA_MACHINE_NAME
+    # we use larger isntance type to ensure that we have enough capacity to run Prometheus
+    docker-machine create -d amazonec2 \
+      --amazonec2-security-group $TLDR_INFRA_NODE_SG_NAME \
+      --amazonec2-instance-type t2.large \
+      --engine-insecure-registry=$REGISTRY $INFRA_MACHINE_NAME
   fi
   eval $(docker-machine env $INFRA_MACHINE_NAME)
 else
