@@ -13,7 +13,7 @@ if [ isAWS ]; then
   # Check if the node already exists
   if ! docker-machine inspect tldr-dev &> /dev/null; then
     print "Creating development node in AWS"
-    docker-machine create -d amazonec2 --engine-insecure-registry=$REGISTRY $DEV_NODE_NAME
+    docker-machine create -d amazonec2 --engine-insecure-registry=$REGISTRY $DEV_NODE_NAME-aws
   fi
   eval $(docker-machine env $INFRA_MACHINE_NAME)
 else
