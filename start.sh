@@ -15,8 +15,9 @@ print "Creating frontend node"
 ./scripts/createSwarmNode.sh 1 frontend
 print "Creating application node"
 ./scripts/createSwarmNode.sh 2 application
+print "Enabing log aggregation"
+./scripts/addLogging.sh
 
 echo "***"
-echo "Process complete. Run the following command to point your local Docker client to the Swarm cluster:"
-echo "  eval $(docker-machine env --swarm tldr-swarm-0)"
+echo "Process complete."
 echo "***"
