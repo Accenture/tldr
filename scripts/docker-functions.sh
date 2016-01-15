@@ -45,14 +45,14 @@ function error() {
 }
 
 function checkAWSData() {
-  if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_VPC_ID" == "" || "$AWS_SUBNET_ID" == "" || "$AWS_ZONE" == "" ]]; then
-    echo "Please set environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_VPC_ID and AWS_SUBNET_ID for the Amazon AWS configuration".
+  if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_VPC_ID" == "" ]]; then
+    echo "Please set environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_VPC_ID for the Amazon AWS configuration".
     exit 1
   fi
 }
 
 function isAWS() {
-  if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_VPC_ID" == "" || "$AWS_SUBNET_ID" == "" || "$AWS_ZONE" == "" ]]; then
+  if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_VPC_ID" == "" ]]; then
     return 1 #false 
   else
     return 0 #true
