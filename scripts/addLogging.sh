@@ -43,7 +43,13 @@ print "Servers in the swarm: $SWARM_MEMBERS"
 for server in $SWARM_MEMBERS; do
   if ! docker $(docker-machine config $server) inspect logspout &> /dev/null; then
     print "Starting logspout on $server"
-    docker $(docker-machine config $server) run -d --name $server-logspout -h logspout -p 8100:8000 -v "//var/run/docker.sock:/tmp/docker.sock" $REGISTRY/tldr/logspout $LOGSTASH
+    docker $(docker-machine config $server) run -d \
+      --name $server-logspout \
+      -h logspout \
+      -p 8100:8000 \
+      -v "//var/run/docker.sock:/tmp/docker.sock" \
+      --restart=always \
+      $REGISTRY/tldr/logspout $LOGSTASH
   else
     print "Logspout already running on $server"
   fi
