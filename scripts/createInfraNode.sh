@@ -27,7 +27,10 @@ fi
 # Start Consul if not already running
 if ! docker inspect consul &> /dev/null; then
   print "Starting consul container"
-  docker run -d -p 8500:8500 --name consul $REGISTRY/consul -server -bootstrap-expect 1
+  docker run -d -p 53:53 -p 53:53/udp -p 8500:8500 --name consul $REGISTRY/consul -server -bootstrap-expect 1
 else
   print "Consul already running"
 fi
+
+# Start registrator
+docker run -d --dns 172.17.0.1 -v /var/run/docker.sock:/tmp/docker.sock -h registrator --name registrator $REGISTRY/registrator -internal consul://consul.service.consul:8500

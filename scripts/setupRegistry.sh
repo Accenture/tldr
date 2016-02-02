@@ -79,11 +79,16 @@ docker tag tldr/logstash $REGISTRY_IP/tldr/logstash
 docker push $REGISTRY_IP/tldr/logstash
 
 print "Caching Prometheus image"
-docker pull prom/prometheus
-docker tag prom/prometheus $REGISTRY_IP/prometheus
-docker push $REGISTRY_IP/prometheus
+docker pull tldr/prometheus
+docker tag tldr/prometheus $REGISTRY_IP/tldr/prometheus
+docker push $REGISTRY_IP/tldr/prometheus
 
 print "Caching cAdvisor image"
 docker pull google/cadvisor:latest
 docker tag google/cadvisor:latest $REGISTRY_IP/cadvisor
 docker push $REGISTRY_IP/cadvisor
+
+print "Caching PromDash image"
+docker pull tldr/promdash
+docker tag tldr/promdash $REGISTRY_IP/tldr/promdash
+docker push $REGISTRY_IP/tldr/promdash

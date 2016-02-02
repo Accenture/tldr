@@ -126,6 +126,14 @@ resource "aws_security_group" "tldr-node" {
       cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # cAdvisor
+  ingress {
+      from_port = 8080
+      to_port = 8080
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]  
+  }
+
   # icmp
   ingress {
     from_port = -1
@@ -193,11 +201,28 @@ resource "aws_security_group" "tldr-infra-node" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Syslog (logstash)
   ingress {
     from_port = 5000
     to_port = 5000
     protocol = "udp"
     security_groups = [ "${aws_security_group.tldr-node.id}" ]
+  }
+
+  # Prometheus
+  ingress {
+    from_port = 9090
+    to_port = 9090
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }  
+
+  # PromDash 
+  ingress {
+    from_port = 3000
+    to_port = 3000
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  
   }
 
   # allow all outbound traffic
