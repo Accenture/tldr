@@ -2,7 +2,9 @@
 
 # General
 
-This is the first draft of a custom Docker based runtime to support 3-tier stateless applications.
+The purpose of The Lightweight Docker Runtime is to serve as a platform that is easy to stand up on a variety of providers, to be able  easily demonstrate the key concepts and capabilities that we believe should be part of a container platform such as composition of applications via Docker Compose, clustering via Swarm, and service discovery, among others.
+
+TLDR is not production-ready or enterprise-grade, nor does it intend to be.
 
 # Features
 
@@ -10,7 +12,7 @@ This is the first draft of a custom Docker based runtime to support 3-tier state
 - 3-node Docker Swarm cluster
 - Dynamic service discovery and registration using Consul and Registrator
 - Deployment of applications via Docker Compose
-- Transparent application container load balancing using the tldr_alb container, which provides seamless scaling of application containers within the Swarm cluster
+- Transparent application container load balancing using the tldr/alb container, which provides seamless scaling of application containers within the Swarm cluster
 - Log aggregation via Logspout, ElasticSearch, Kibana and Logstash 
 - Monitoring and metrics via Prometheus and cAdvisor
 
@@ -79,9 +81,13 @@ At the moment the AMI image for Ubuntu 15.10 is hardcoded as ami-fe001292 and *o
 export TLDR_DOCKER_MACHINE_AMI=ami-xxxxx
 ```
 
-# Reference application
+# Reference applications
 
 See README.md under apps/todo/ for more information.
+
+# Contributing
+
+TLDR is licensed under the Apache 2.0 license and issues and contributions are more than welcome.
 
 # TODO
 
