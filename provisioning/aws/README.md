@@ -1,6 +1,6 @@
 # TLDR AWS Provisioning
 
-This folder provisions a basic configuration on AWS to run TLDR, with a VPC with a subnet and an internet gateway to access it.
+This folder provisions a basic configuration on AWS to run TLDR, with a VPC containing a subnet and an internet gateway to access it.
 
 # Pre-requisites
 
@@ -11,7 +11,9 @@ This folder provisions a basic configuration on AWS to run TLDR, with a VPC with
 Before starting, provision an the needed credentials from the AWS admin console, and export them as environment variables:
 
 ```
-
+export AWS_ACCESS_KEY_ID=<access-key-id>
+export AWS_SECRET_ACCESS_KEY=<secret-access-key>
+epxort AWS_DEFAULT_REGION=<default-region, e.g. eu-west>
 ```
 
 # Provisioning the infrastructure

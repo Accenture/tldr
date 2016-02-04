@@ -20,19 +20,35 @@ The following are needed to get this environment running:
 
 - Docker Toolbox 1.9.1
 - Docker Machine 0.5.2 or higher if you intend to deploy the platform to Amazon Web Services; the default version from Docker Toolbox 1.9.1 will work just fine with VirtualBox deploymnts but please note that 0.5.2 or higher are not currently part of the Docker Toolbox package!. The latest version from  is available at https://github.com/docker/machine/releases, but version 0.5.5 seemed to crash when dealing with the configuration of security groups upon instance creation.
-- Bash/Cygwin (not fully tested in Windows)
+- Bash/Cygwin if running on Windows
+
+When running locally, 8Gb of RAM is the minimum recommended amount of memory in order to comfortably run all components.
 
 # Usage
 
 ## Setting up locally
 
-Use script ```start.sh``` to set up the Docker Swarm platform and technical components. The process should take approximately 10 minutes, depending on the specs of your host machine as well as the speed of your network connection (several containers will be pulled from the Docker Hub, and cached locally).
+Use script ```start.sh``` to set up the Docker Swarm platform and technical components. The process should take approximately 10-15 minutes, depending on the specs of your host machine as well as the speed of your network connection (several containers will be pulled from the Docker Hub, and cached locally).
 
 Once the process is complete, run ```info.sh``` to provide a list of the available endpoints for inspection.
 
 ## Setting up in AWS
 
-Please note that Docker Machine 0.5.2 or higher is needed, otherwise the process will work.
+TLDR is supported on AWS when running in region *eu-central-1*, and provides a process for provisioning AWS resources as well as deploying the platform components.
+
+The platform is very likely to work in other regions, but please see "Running in a region that is not eu-central-1" below for the time being until the provisioning process is improved to take other regions into account.
+
+### Setting up AWS resources
+
+First, a set of Amazon AWS resources will be provisioned to host the platform: a VPC, with a subnet, routing tables and an internet gateway. This is to keep the platform separated from any other AWS resources that may currently be in use.
+
+Provisioning of AWS resources is handled via Terraform, please see provisioning/aws/README.md for detailed steps.
+
+### Provisioning the components
+
+Please note that Docker Machine 0.5.2 or higher is needed, otherwise the process will not work.
+
+Once the AWS resources have been provisioned, the TLDR platfomr can be deployed.
 
 Set the following environment variables with your AWS secrets before running the start.sh script:
 
@@ -40,17 +56,27 @@ Set the following environment variables with your AWS secrets before running the
 export AWS_ACCESS_KEY_ID=<secret key>
 export AWS_SECRET_ACCESS_KEY=<secret access key>
 export AWS_VPC_ID=<vpc-id>
-export AWS_ZONE=<zone, one of a, b, c, d or e>
-export AWS_SUBNET_ID=<subnet-id>
 ```
 
-Please note that at the moment the AMI image name for the Ubuntu 15.10 image is hardcoded as ami-fe001292. This needs to be changed to be more easily configurable.
+The values for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY can be obtained from the AWS admin console. 
+
+The value for AWS_VPC_ID will also be available from the console, as the AWS provisioning process creates a VPC called ```tldr-vpc```. Once the AWS provisioning process via Terraform is complete, use the AWS admin console to obtain the id of the ```tldr-vpc```VPC resource, e.g. ```vpc-fe53be97```.
+
+### Overriding EC2 instance sizes
 
 Additionally, teh following environment variables can be used to override some of the default values used for EC2 instances:
 
 ```
 AWS_INSTANCE_TYPE=t2.micro
 AWS_ROOT_SIZE=16
+```
+
+### Running in a region that is not eu-central-1
+
+At the moment the AMI image for Ubuntu 15.10 is hardcoded as ami-fe001292 and *only works in region eu-central-1*. If you are running in a region that is not eu-west-1, find out the id of the Ubuntu 15.10 image for your region and expose it as an environment variable:
+
+```
+export TLDR_DOCKER_MACHINE_AMI=ami-xxxxx
 ```
 
 # Reference application

@@ -8,7 +8,7 @@ if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_DEFA
 fi
 
 if [[ "$1" == "" ]] ; then
-	echo "usage: $0 [plan/apply/destroy..]"
+	echo "usage: $0 [plan/apply/destroy/...]"
 	exit 1
 fi
 
