@@ -1,8 +1,0 @@
-- currently 300k VMs, moving to 500k VMs, up to 1m VMs in the next 3-5 years
-- no existing container capabilities
-- internal private cloud, used by client's R&D teams
-- initial dates for planning starting on mid-Feb or March
-
-To provide:
-
-- plan for resourcing 
