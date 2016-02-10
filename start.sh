@@ -6,18 +6,16 @@ function print() {
 }
 
 print "Setting up registry server"
-./scripts/setupRegistry.sh
+./bin/createRegistryNode.sh
 print "Setting up infra"
-./scripts/createInfraNode.sh
+./bin/createInfraNode.sh
 print "Creating swarm master"
-./scripts/createSwarmNode.sh 0
+./bin/createSwarmNode.sh 0
 print "Creating frontend node"
-./scripts/createSwarmNode.sh 1 frontend
+./bin/createSwarmNode.sh 1 frontend
 print "Creating application node"
-./scripts/createSwarmNode.sh 2 application
-print "Enabing log aggregation"
-./scripts/addLogging.sh
+./bin/createSwarmNode.sh 2 application
 
-echo "***"
-echo "Process complete."
-echo "***"
+info "***"
+info "Process complete."
+info "***"

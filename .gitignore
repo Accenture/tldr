@@ -2,3 +2,4 @@
 *.tfstate
 *.backup
 *.tfstate.backup
+credentials.txt

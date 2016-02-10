@@ -34,27 +34,3 @@ function checkService() {
 function checkNode() {
   ( docker-machine ls | grep "^$@ " ) >> /dev/null
 }
-
-# Pretty print the given string
-function print() {
-  printf "\e[33m*** \e[32m$1 \e[33m***\e[0m\n"
-}
-
-function error() {
-  printf "\e[31mERROR: $1\e[0m\n"
-}
-
-function checkAWSData() {
-  if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_VPC_ID" == "" ]]; then
-    echo "Please set environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_VPC_ID for the Amazon AWS configuration".
-    exit 1
-  fi
-}
-
-function isAWS() {
-  if [[ "$AWS_ACCESS_KEY_ID" == "" || "$AWS_SECRET_ACCESS_KEY" == "" || "$AWS_VPC_ID" == "" ]]; then
-    return 1 #false 
-  else
-    return 0 #true
-  fi
-}

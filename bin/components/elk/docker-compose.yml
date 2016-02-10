@@ -1,0 +1,19 @@
+elasticsearch:
+  image: ${REGISTRY}/tldr/elasticsearch
+  ports:
+    - 9300:9300
+    - 9200:9200
+
+logstash:
+  image: ${REGISTRY}/tldr/logstash
+  ports:
+    - 5000:5000
+  links:
+    - elasticsearch
+
+kibana:
+  image: ${REGISTRY}/tldr/kibana
+  ports:
+    - 5601:5601
+  links:
+    - elasticsearch

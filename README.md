@@ -58,6 +58,7 @@ Set the following environment variables with your AWS secrets before running the
 export AWS_ACCESS_KEY_ID=<secret key>
 export AWS_SECRET_ACCESS_KEY=<secret access key>
 export AWS_VPC_ID=<vpc-id>
+export AWS_DEFAULT_REGION=eu-central-1
 ```
 
 The values for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY can be obtained from the AWS admin console. 
