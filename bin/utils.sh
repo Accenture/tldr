@@ -41,3 +41,10 @@ function detect_provider() {
     TLDR_PROVIDER="local"
   fi
 }
+
+#
+# return a string with the container status, as reported by docker inspect
+#
+function container_status() {
+  docker inspect --format='{{.State.Status}}' $1  
+}

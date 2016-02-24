@@ -3,12 +3,12 @@
 prometheus:
   dns: 172.17.0.1
   image: ${REGISTRY}/tldr/prometheus
-  expose:
+  ports:
     - 9090:9090
 
 # docker run -d --name promdash -h promdash --dns 172.17.0.1 -p 3000:3000 $REGISTRY/tldr/promdash
 promdash:
   dns: 172.17.0.1
   image: ${REGISTRY}/tldr/promdash
-  expose:
+  ports:
     - 3000:3000

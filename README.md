@@ -21,7 +21,7 @@ TLDR is not production-ready or enterprise-grade, nor does it intend to be.
 The following are needed to get this environment running:
 
 - Docker Toolbox 1.9.1
-- Docker Machine 0.5.2 or higher if you intend to deploy the platform to Amazon Web Services; the default version from Docker Toolbox 1.9.1 will work just fine with VirtualBox deploymnts but please note that 0.5.2 or higher are not currently part of the Docker Toolbox package!. The latest version from  is available at https://github.com/docker/machine/releases, but version 0.5.5 seemed to crash when dealing with the configuration of security groups upon instance creation.
+- Docker Machine 0.6.0 or higher
 - Bash/Cygwin if running on Windows
 
 When running locally, 8Gb of RAM is the minimum recommended amount of memory in order to comfortably run all components.

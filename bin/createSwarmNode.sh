@@ -41,17 +41,7 @@ docker $(docker-machine config $NAME) run -d \
        --name $NAME-registrator \
        --net tldr-overlay \
        $REGISTRY/registrator \
-       -internal consul://tldr-swarm-$1-consul:8500
-
-print "Starting Logspout on $NAME"
-docker $(docker-machine config $NAME) run -d \
-	  --name $NAME-logspout \
-	  -h logspout \
-	  -p 8100:8000 \
-	  --net tldr-overlay \
-	  -v "//var/run/docker.sock:/tmp/docker.sock" \
-	  --restart=always \
-	  $REGISTRY/tldr/logspout $LOGSTASH
+       -internal consul://$NAME-consul:8500
 
 print "Starting cAdvisor on $NAME"
 docker $(docker-machine config $NAME) run \
@@ -63,7 +53,7 @@ docker $(docker-machine config $NAME) run \
     --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro \
     --publish=8080:8080 \
     --detach=true \
-    --name=cadvisor \
+    --name=$NAME-cadvisor \
     --restart=always \
     $REGISTRY/cadvisor
 

@@ -42,15 +42,20 @@ fi
 function create_registry_node() {
 	if ! docker-machine status $REGISTRY_MACHINE_NAME &> /dev/null; then
 	  info "Creating private registry server on AWS"
-	  docker-machine create --driver amazonec2 --amazonec2-security-group $TLDR_REGISTRY_SG_NAME $REGISTRY_MACHINE_NAME
+	  docker-machine create --driver amazonec2 \
+	  						--amazonec2-security-group \
+	  						$TLDR_REGISTRY_SG_NAME \
+	  						$REGISTRY_MACHINE_NAME
 	  if [ $? -ne 0 ]; then
 	    error "There was a problem creating the node."
 	    exit 1
 	  fi
 
 	  # TODO: can we move this to the common part of the process?
-	  REGISTRY_IP=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
-	  docker-machine ssh $REGISTRY_MACHINE_NAME "echo $'DOCKER_OPTS=\"\$DOCKER_OPTS --insecure-registry='$REGISTRY_IP'\"' | sudo tee -a /etc/default/docker && sudo service docker restart"
+	  # we can't use --engine-insecure-registry  during docker-machine because at that stage we don't know the machine's own IP address yet
+	  REGISTRY_IP=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000	  
+	  docker-machine ssh $REGISTRY_MACHINE_NAME "sudo sed -i \"/^ExecStart=/ s/\$/ --insecure-registry=$REGISTRY_IP/\" /etc/systemd/system/docker.service && sudo systemctl daemon-reload && sudo service docker restart"
+
 	  docker $(docker-machine config $REGISTRY_MACHINE_NAME) run -d -p 5000:5000 --restart=always --name registry registry:2
 	else
 	  REGISTRY_IP=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
@@ -63,9 +68,9 @@ function create_registry_node() {
 #
 function create_infra_node() {
 	# Check if the node already exists
-	REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
+	export REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
 	if ! docker-machine inspect $INFRA_MACHINE_NAME &> /dev/null; then
-	  info "Creating infra node into AWS"
+	  info "Creating infra node on AWS"
 	  # we use larger isntance type to ensure that we have enough capacity to run Prometheus
 	  docker-machine create -d amazonec2 \
 	    --amazonec2-security-group $TLDR_INFRA_NODE_SG_NAME \
@@ -81,16 +86,22 @@ function create_swarm_master() {
 	CONSUL=$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME)
   	REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
   	ELASTICSEARCH=http://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):9200
-  	LOGSTASH=syslog://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):5000
+  	LOGSTASH=udp://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):5000
 
 	if ! docker-machine inspect $NAME &> /dev/null; then
 	  info "Creating swarm master with name '$NAME' in AWS"
 	  docker-machine create -d amazonec2 \
 	    --swarm --swarm-master --swarm-discovery="consul://$CONSUL:8500" \
 	    --swarm-image $REGISTRY/swarm \
-	    --engine-opt="cluster-store=consul://$CONSUL:8500" --engine-insecure-registry="$REGISTRY" \
-	    --engine-opt="cluster-advertise=eth0:2376" $OPTIONS --swarm-image $REGISTRY/swarm \
-	    --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" --amazonec2-security-group="$TLDR_NODE_SG_NAME" $NAME
+	    --engine-opt="cluster-store=consul://$CONSUL:8500" \
+	    --engine-insecure-registry="$REGISTRY" \
+	    --engine-opt="cluster-advertise=eth0:2376" \
+	    --engine-opt="log-driver=syslog" \
+	    --engine-opt="log-opt syslog-address=$LOGSTASH" \
+	    $OPTIONS \
+	    --swarm-image $REGISTRY/swarm \
+	    --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" --amazonec2-security-group="$TLDR_NODE_SG_NAME" \
+	    $NAME
 	  info "Creating network tldr-overlay"
 	  docker $(docker-machine config $NAME) network create --driver overlay tldr-overlay
 	  info "Starting master consul"
@@ -106,8 +117,9 @@ function create_swarm_node() {
 	CONSUL=$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME)
   	REGISTRY=$(docker-machine inspect --format='{{.Driver.PrivateIPAddress}}' $REGISTRY_MACHINE_NAME):5000
   	ELASTICSEARCH=http://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):9200
-  	LOGSTASH=syslog://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):5000
+  	LOGSTASH=udp://$(docker-machine inspect --format '{{.Driver.PrivateIPAddress}}' $INFRA_MACHINE_NAME):5000
   	
+  	[ $2 ] && EXTRA_OPTS="--engine-label=\"type=$2\""
 	# For some reason the join only works with an IP address, not with hostname
 	OVERLAY_CONSUL=$(docker $(docker-machine config $SWARM_MACHINE_NAME_PREFIX-0) inspect -f '{{(index .NetworkSettings.Networks "tldr-overlay").IPAddress}}' tldr-swarm-0-consul)
 	if ! docker-machine inspect $NAME &> /dev/null; then
@@ -115,10 +127,15 @@ function create_swarm_node() {
 	  docker-machine create --driver amazonec2 \
 	     --swarm --swarm-discovery="consul://$CONSUL:8500" \
 	     --swarm-image $REGISTRY/swarm \
-	     --engine-opt="cluster-store=consul://$CONSUL:8500" --engine-opt="cluster-advertise=eth0:2376" $OPTIONS --engine-insecure-registry="$REGISTRY" \
+	     --engine-opt="cluster-store=consul://$CONSUL:8500" \
+	     --engine-opt="cluster-advertise=eth0:2376" \
+	     --engine-opt="log-driver=syslog" \
+	     --engine-opt="log-opt syslog-address=$LOGSTASH" \
+	     $EXTRA_OPTS \
+	     --engine-insecure-registry="$REGISTRY" \
 	     --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" --amazonec2-security-group="$TLDR_NODE_SG_NAME" $NAME
 	  info "Starting Consul agent"
-	  docker $(docker-machine config $NAME) run -d -p 172.17.0.1:53:53 -p 172.17.0.1:53:53/udp -p 8500:8500 --name tldr-swarm-$1-consul --net tldr-overlay $REGISTRY/consul -join $OVERLAY_CONSUL
+	  docker $(docker-machine config $NAME) run -d -p 172.17.0.1:53:53 -p 172.17.0.1:53:53/udp -p 8500:8500 --name $NAME-consul --net tldr-overlay $REGISTRY/consul -join $OVERLAY_CONSUL
 	else
 	  info "$NAME already running"
 	  exit 1

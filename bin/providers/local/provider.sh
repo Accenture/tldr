@@ -46,7 +46,7 @@ function create_registry_node() {
 }
 
 function create_infra_node() {
-  REGISTRY=$(docker-machine ip $REGISTRY_MACHINE_NAME):5000
+  export REGISTRY=$(docker-machine ip $REGISTRY_MACHINE_NAME):5000
 	if ! docker-machine inspect $INFRA_MACHINE_NAME &> /dev/null; then
 	  docker-machine create --driver virtualbox --engine-insecure-registry=$REGISTRY $INFRA_MACHINE_NAME
 	fi
@@ -59,11 +59,22 @@ function create_swarm_master() {
   CONSUL=$(docker-machine ip $INFRA_MACHINE_NAME)
   REGISTRY=$(docker-machine ip $REGISTRY_MACHINE_NAME):5000
   ELASTICSEARCH=http://$(docker-machine ip $INFRA_MACHINE_NAME):9200
-  LOGSTASH=syslog://$(docker-machine ip $INFRA_MACHINE_NAME):5000
+  LOGSTASH=udp://$(docker-machine ip $INFRA_MACHINE_NAME):5000
 
   if ! docker-machine inspect $NAME &> /dev/null; then
     info "Creating swarm master with name '$NAME' locally"
-    docker-machine create --driver virtualbox --swarm --swarm-master  --swarm-discovery consul://$CONSUL:8500 --swarm-image $REGISTRY/swarm --engine-opt="cluster-store=consul://$CONSUL:8500" $OPTIONS --engine-opt="cluster-advertise=eth1:2376" --engine-insecure-registry=$REGISTRY $NAME
+    docker-machine create --driver virtualbox \
+          --swarm \
+          --swarm-master  \
+          --swarm-discovery consul://$CONSUL:8500 \
+          --swarm-image $REGISTRY/swarm \
+          --engine-opt="cluster-store=consul://$CONSUL:8500" \
+          $OPTIONS \
+          --engine-opt="log-driver=syslog" \
+          --engine-opt="log-opt syslog-address=$LOGSTASH" \
+          --engine-opt="cluster-advertise=eth1:2376" \
+          --engine-insecure-registry=$REGISTRY \
+          $NAME
     info "Creating network tldr-overlay"
     docker $(docker-machine config $NAME) network create --driver overlay tldr-overlay
     info "Starting master consul"
@@ -79,16 +90,26 @@ function create_swarm_node() {
   CONSUL=$(docker-machine ip $INFRA_MACHINE_NAME)
   REGISTRY=$(docker-machine ip $REGISTRY_MACHINE_NAME):5000
   ELASTICSEARCH=http://$(docker-machine ip $INFRA_MACHINE_NAME):9200
-  LOGSTASH=syslog://$(docker-machine ip $INFRA_MACHINE_NAME):5000
+  LOGSTASH=udp://$(docker-machine ip $INFRA_MACHINE_NAME):5000
 
   [ $2 ] && EXTRA_OPTS="--engine-label=\"type=$2\""
   # For some reason the join only works with an IP address, not with hostname
   OVERLAY_CONSUL=$(docker $(docker-machine config $SWARM_MACHINE_NAME_PREFIX-0) inspect -f '{{(index .NetworkSettings.Networks "tldr-overlay").IPAddress}}' tldr-swarm-0-consul)
   if ! docker-machine inspect $NAME &> /dev/null; then
     info "Creating swarm node with name '$NAME' locally, label: $2"
-    docker-machine create --driver virtualbox --swarm --swarm-discovery consul://$CONSUL:8500 --swarm-image $REGISTRY/swarm --engine-opt="cluster-store=consul://$CONSUL:8500" --engine-opt="cluster-advertise=eth1:2376" $EXTRA_OPTS --engine-insecure-registry=$REGISTRY $NAME
+    docker-machine create --driver virtualbox \
+        --swarm \
+        --swarm-discovery consul://$CONSUL:8500 \
+        --swarm-image $REGISTRY/swarm \
+        --engine-opt="cluster-store=consul://$CONSUL:8500" \
+        --engine-opt="cluster-advertise=eth1:2376" \
+        $EXTRA_OPTS \
+        --engine-opt="log-opt syslog-address=$LOGSTASH" \
+        --engine-opt="cluster-advertise=eth1:2376" \
+        --engine-insecure-registry=$REGISTRY \
+        $NAME
     info "Starting Consul agent"
-    docker $(docker-machine config $NAME) run -d -p 172.17.0.1:53:53 -p 172.17.0.1:53:53/udp -p 8500:8500 --name tldr-swarm-$1-consul --net tldr-overlay $REGISTRY/consul -join $OVERLAY_CONSUL
+    docker $(docker-machine config $NAME) run -d -p 172.17.0.1:53:53 -p 172.17.0.1:53:53/udp -p 8500:8500 --name $NAME-consul --net tldr-overlay $REGISTRY/consul -join $OVERLAY_CONSUL
   else
     info "$NAME already running"
     exit 1

@@ -28,13 +28,12 @@ source $TLDR_BIN/providers/$TLDR_PROVIDER/provider.sh
 # delegate node provisioning and preparation to the provider
 create_infra_node
 
-# retrieve the IP address of the registry node so that we can deploy infrastructure containers
-REGISTRY=$(docker-machine ip $REGISTRY_MACHINE_NAME):5000
-
 # Start Consul if not already running
 if ! docker inspect consul &> /dev/null; then
   info "Starting Consul"
-  docker run -d -p 53:53 -p 53:53/udp -p 8500:8500 --name consul $REGISTRY/consul -server -bootstrap-expect 1
+  # need to bind to 172.17.0.1 (the bridge IP address) specifically because the host may be running a local DNS server in port 53
+  # such as dnsmasq (been there, done that) 
+  docker run -d -p 172.17.0.1:53:53 -p 172.17.0.1:53:53/udp -p 8500:8500 --name consul $REGISTRY/consul -server -bootstrap-expect 1
 else
   info "Consul already running"
 fi
@@ -54,7 +53,18 @@ fi
 
 # set up the logging components
 eval $(docker-machine env $INFRA_MACHINE_NAME)
-REGISTRY=$REGISTRY docker-compose -f components/elk/docker-compose.yml up -d
+REGISTRY=$REGISTRY docker-compose -f $TLDR_ROOT/bin/components/elk/docker-compose.yml up -d
 
 # and the monitoring components
-REGISTRY=$REGISTRY docker-compose -f components/monitoring/docker-compose.yml up -d
+REGISTRY=$REGISTRY docker-compose -f $TLDR_ROOT/bin/components/monitoring/docker-compose.yml up -d
+
+# test that all the pieces are working
+if [ "$(container_status consul)" != "running" ]; then
+  error "Consul was not successfully started."
+  exit 1
+fi
+
+if [ "$(container_status registrator)" != "running" ]; then
+  error "Registrator was not successfully started."
+  exit 1
+fi

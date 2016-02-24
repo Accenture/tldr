@@ -55,11 +55,6 @@ docker pull tldr/kibana
 docker tag tldr/kibana $REGISTRY_IP/tldr/kibana
 docker push $REGISTRY_IP/tldr/kibana
 
-info "Caching Logspout image"
-docker pull tldr/logspout
-docker tag tldr/logspout $REGISTRY_IP/tldr/logspout
-docker push $REGISTRY_IP/tldr/logspout
-
 info "Caching Logstash image"
 docker pull tldr/logstash
 docker tag tldr/logstash $REGISTRY_IP/tldr/logstash
