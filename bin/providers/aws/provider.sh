@@ -36,6 +36,32 @@ if [ -z "$TLDR_DOCKER_MACHINE_AMI" ]; then
 	TLDR_DOCKER_MACHINE_AMI="ami-fe001292"
 fi
 
+# check that all AWS_ variables are in place
+if [ -z "$AWS_ACCESS_KEY_ID" ]; then
+	error "Please provide your AWS access key using AWS_ACCESS_KEY_ID environment variable"
+	exit 1
+fi
+
+if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+	error "Please provide your AWS secret access key using AWS_SECRET_ACCESS_KEY environment variable"
+	exit 1
+fi
+
+if [ -z "$AWS_DEFAULT_REGION" ]; then
+	error "Please provide your AWS region using AWS_DEFAULT_REGION environment variable"
+	exit 1
+fi
+
+if [ -z "$AWS_VPC_ID" ]; then
+	error "Please provide your AWS VPC id using AWS_VPC_ID environment variable"
+	exit 1
+fi
+
+if [ -z "$AWS_DEFAULT_ZONE" ]; then
+	error "Please provide your AWS default availability zone using AWS_DEFAULT_ZONE environment variable"
+	exit 1
+fi
+
 #
 # Sets up the registry node in a manner that is specific for AWS
 #
@@ -43,10 +69,8 @@ function create_registry_node() {
 	if ! docker-machine status $REGISTRY_MACHINE_NAME &> /dev/null; then
 	  info "Creating private registry server on AWS"
 	  docker-machine create --driver amazonec2 \
-	  						--amazonec2-security-group \
-	  						$TLDR_REGISTRY_SG_NAME \
-							--amazonec2-zone \
-							$AWS_DEFAULT_ZONE \
+	  						--amazonec2-security-group $TLDR_REGISTRY_SG_NAME \
+							--amazonec2-zone $AWS_DEFAULT_ZONE \
 	  						$REGISTRY_MACHINE_NAME
 	  if [ $? -ne 0 ]; then
 	    error "There was a problem creating the node."
@@ -116,7 +140,7 @@ function create_swarm_master() {
 	       -p 172.17.0.1:53:53 \
 	       -p 172.17.0.1:53:53/udp \
 	       -p 8500:8500 \
-	       --name tldr-swarm-0-consul \
+	       --name $NAME-consul \
 	       --net tldr-overlay \
 	       $REGISTRY/consul \
 	       -server \
@@ -136,9 +160,9 @@ function create_swarm_node() {
   	
   	[ $2 ] && EXTRA_OPTS="--engine-label=\"type=$2\""
 	# For some reason the join only works with an IP address, not with hostname
-	OVERLAY_CONSUL=$(docker $(docker-machine config $SWARM_MACHINE_NAME_PREFIX-0) inspect -f '{{(index .NetworkSettings.Networks "tldr-overlay").IPAddress}}' tldr-swarm-0-consul)
+	OVERLAY_CONSUL=$(docker $(docker-machine config $SWARM_MACHINE_NAME_PREFIX-0) inspect -f '{{(index .NetworkSettings.Networks "tldr-overlay").IPAddress}}' tldr-swarm-aws-0-consul)
 	if ! docker-machine inspect $NAME &> /dev/null; then
-	  info "Creating swarm node with name '$NAME' to AWS, label: $2"
+	  info "Creating swarm node with name '$NAME' in AWS, label: $2"
 	  docker-machine create --driver amazonec2 \
 	     --swarm --swarm-discovery="consul://$CONSUL:8500" \
 	     --swarm-image $REGISTRY/swarm \
@@ -159,8 +183,7 @@ function create_swarm_node() {
 	         -p 8500:8500 \
 	         --name $NAME-consul \
 	         --net tldr-overlay \
-	         $REGISTRY/consul \
-	         -join $OVERLAY_CONSUL
+	         $REGISTRY/consul -join $OVERLAY_CONSUL
 	else
 	  info "$NAME already running"
 	  exit 1
