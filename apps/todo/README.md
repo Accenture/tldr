@@ -19,6 +19,8 @@ After bootstrapping the TLDR platform, ensure your Docker client is pointing to 
 eval $(docker-machine env --swarm tldr-swarm-0)
 ```
 
+Note: use tldr-swarm-aws-0 if you've deployed the platform components to AWS.
+
 Next, use docker-compose to stand up the application:
 
 ```
@@ -71,6 +73,24 @@ In order to verify that the scaling worked and that all the new instances are re
 # Deploying to Amazon AWS
 
 If the Swarm cluster is running in AWS, the application will be automatically deployed there.
+
+# Troublshooting
+
+Currently Compose starts components in arbitrary order. The todo_backend container will retry for up to 60 seconds to find its Mongo backend; depending on the speed of your connection it may take more than the default timeout to download the Mongo container, and the backend container will have given up by then. When running ```docker-compose ps```, its status will be "Exit":
+
+```
+      Name                     Command               State                             Ports                           
+----------------------------------------------------------------------------------------------------------------------
+mongo               /entrypoint.sh mongod            Up       27017/tcp                                                
+todo_backend_1      /start.sh                        Exit 0                                                            
+...
+```
+
+When this issue appears, simply restart the backend container:
+
+```
+docker-compose start backend
+```
 
 # Known issues
 
