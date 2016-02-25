@@ -132,3 +132,9 @@ function create_swarm_node() {
     exit 1
   fi  
 }
+
+function destroy_instances() {
+  INSTANCES=$(docker-machine ls --filter name="tldr" --filter driver=virtualbox -q)
+  info "Destroying the following instances: $INSTANCES"
+  docker-machine rm -f $INSTANCES  
+}

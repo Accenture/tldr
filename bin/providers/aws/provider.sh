@@ -189,3 +189,9 @@ function create_swarm_node() {
 	  exit 1
 	fi
 }
+
+function destroy_instances() {
+	INSTANCES=$(docker-machine ls --filter name="tldr.*-aws.*" --filter driver=amazonec2 -q)
+	info "Destroying the following instances: $INSTANCES"
+	docker-machine rm -f $INSTANCES
+}

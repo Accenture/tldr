@@ -14,4 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-bin/destroy.sh
+TLDR_ROOT=$(dirname ${BASH_SOURCE[0]})/..
+TLDR_BIN=$TLDR_ROOT/bin
+source $TLDR_BIN/utils.sh
+
+detect_provider
+info "Using provider: ${TLDR_PROVIDER}"
+source $TLDR_BIN/providers/$TLDR_PROVIDER/provider.sh
+
+destroy_instances
