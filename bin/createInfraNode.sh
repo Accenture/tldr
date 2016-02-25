@@ -20,6 +20,8 @@ TLDR_ROOT=$(dirname ${BASH_SOURCE[0]})/..
 TLDR_BIN=$TLDR_ROOT/bin
 source $TLDR_BIN/utils.sh
 
+print "Setting up infra"
+
 # Creates infra node if needed
 detect_provider
 info "Using provider: ${TLDR_PROVIDER}"
