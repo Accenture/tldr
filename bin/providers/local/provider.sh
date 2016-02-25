@@ -78,7 +78,15 @@ function create_swarm_master() {
     info "Creating network tldr-overlay"
     docker $(docker-machine config $NAME) network create --driver overlay tldr-overlay
     info "Starting master consul"
-    docker $(docker-machine config $NAME) run -d -p 172.17.0.1:53:53 -p 172.17.0.1:53:53/udp -p 8500:8500 --name tldr-swarm-0-consul --net tldr-overlay $REGISTRY/consul -server -bootstrap-expect 1
+    docker $(docker-machine config $NAME) run \
+        -d \
+        -p 172.17.0.1:53:53 \
+        -p 172.17.0.1:53:53/udp \
+        -p 8500:8500 \
+        --name tldr-swarm-0-consul \
+        --net tldr-overlay \
+        $REGISTRY/consul \
+        -server -bootstrap-expect 1
   else
     info "$NAME already running"
     exit 1
@@ -103,13 +111,22 @@ function create_swarm_node() {
         --swarm-image $REGISTRY/swarm \
         --engine-opt="cluster-store=consul://$CONSUL:8500" \
         --engine-opt="cluster-advertise=eth1:2376" \
-        $EXTRA_OPTS \
+        --engine-opt="log-driver=syslog" \
         --engine-opt="log-opt syslog-address=$LOGSTASH" \
-        --engine-opt="cluster-advertise=eth1:2376" \
         --engine-insecure-registry=$REGISTRY \
+        $EXTRA_OPTS \
         $NAME
+
     info "Starting Consul agent"
-    docker $(docker-machine config $NAME) run -d -p 172.17.0.1:53:53 -p 172.17.0.1:53:53/udp -p 8500:8500 --name $NAME-consul --net tldr-overlay $REGISTRY/consul -join $OVERLAY_CONSUL
+    docker $(docker-machine config $NAME) run \
+        -d \
+        -p 172.17.0.1:53:53 \
+        -p 172.17.0.1:53:53/udp \
+        -p 8500:8500 \
+        --name $NAME-consul \
+        --net tldr-overlay \
+        $REGISTRY/consul \
+        -join $OVERLAY_CONSUL
   else
     info "$NAME already running"
     exit 1
