@@ -83,7 +83,7 @@ function create_swarm_master() {
         -p 172.17.0.1:53:53 \
         -p 172.17.0.1:53:53/udp \
         -p 8500:8500 \
-        --name tldr-swarm-0-consul \
+        --name $NAME-consul \
         --net tldr-overlay \
         $REGISTRY/consul \
         -server -bootstrap-expect 1
