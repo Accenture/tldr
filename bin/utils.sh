@@ -2,7 +2,7 @@
 
 # Pretty print the given string
 function print() {
-  printf "\e[33m*** \e[32m$1 \e[33m***\e[0m\n"
+  printf "\e[33m==== \e[32m$1 \e[33m ====\e[0m\n"
 }
 
 function info() {
