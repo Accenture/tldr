@@ -27,8 +27,10 @@ info "Using provider: ${TLDR_PROVIDER}"
 source $TLDR_BIN/providers/$TLDR_PROVIDER/provider.sh
 
 if [ $1 -eq 0 ]; then
+  print "Creating Swarm master"
   create_swarm_master
 else
+  print "Creating Swarm worker node"
   create_swarm_node $1 $2
 fi
 
