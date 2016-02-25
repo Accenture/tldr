@@ -58,3 +58,16 @@ docker $(docker-machine config $NAME) run \
     $REGISTRY/cadvisor
 
 info "Started a new node with IP \e[31m$(docker-machine ip $NAME)"
+
+# make sure components are there
+# test that all the pieces are working
+eval $(docker-machine env $NAME)
+if [ "$(container_status $NAME-consul)" != "running" ]; then
+  error "Consul was not successfully started."
+  exit 1
+fi
+
+if [ "$(container_status $NAME-registrator)" != "running" ]; then
+  error "Registrator was not successfully started."
+  exit 1
+fi
