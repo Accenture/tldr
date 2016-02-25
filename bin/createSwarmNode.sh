@@ -46,11 +46,11 @@ docker $(docker-machine config $NAME) run -d \
 print "Starting cAdvisor on $NAME"
 docker $(docker-machine config $NAME) run \
     --name cadvisor \
-    --volume=/:/rootfs:ro \
-    --volume=/var/run:/var/run:rw \
-    --volume=/sys:/sys:ro \
-    --volume=/var/lib/docker/:/var/lib/docker:ro \
-    --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro \
+    --volume="//:/rootfs:ro" \
+    --volume="//var/run:/var/run:rw" \
+    --volume="//sys:/sys:ro" \
+    --volume="//var/lib/docker/:/var/lib/docker:ro" \
+    --volume="//sys/fs/cgroup:/sys/fs/cgroup:ro" \
     --publish=8080:8080 \
     --detach=true \
     --name=$NAME-cadvisor \

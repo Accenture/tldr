@@ -42,7 +42,7 @@ fi
 if ! docker inspect registrator &> /dev/null; then
   info "Starting Registrator"
   docker run -d --dns 172.17.0.1 \
-           -v /var/run/docker.sock:/tmp/docker.sock \
+           -v "//var/run/docker.sock:/tmp/docker.sock" \
            -h registrator \
            --name registrator \
            $REGISTRY/registrator \
