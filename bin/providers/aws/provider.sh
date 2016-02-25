@@ -45,6 +45,8 @@ function create_registry_node() {
 	  docker-machine create --driver amazonec2 \
 	  						--amazonec2-security-group \
 	  						$TLDR_REGISTRY_SG_NAME \
+							--amazonec2-zone \
+							$AWS_DEFAULT_ZONE \
 	  						$REGISTRY_MACHINE_NAME
 	  if [ $? -ne 0 ]; then
 	    error "There was a problem creating the node."
@@ -75,7 +77,9 @@ function create_infra_node() {
 	  docker-machine create -d amazonec2 \
 	    --amazonec2-security-group $TLDR_INFRA_NODE_SG_NAME \
 	    --amazonec2-instance-type t2.large \
-	    --engine-insecure-registry=$REGISTRY $INFRA_MACHINE_NAME
+	    --engine-insecure-registry=$REGISTRY \
+	    --amazonec2-zone $AWS_DEFAULT_ZONE \
+		$INFRA_MACHINE_NAME
 	fi
 
 	eval $(docker-machine env $INFRA_MACHINE_NAME)
@@ -101,6 +105,7 @@ function create_swarm_master() {
 	    $OPTIONS \
 	    --swarm-image $REGISTRY/swarm \
 	    --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" --amazonec2-security-group="$TLDR_NODE_SG_NAME" \
+	    --amazonec2-zone $AWS_DEFAULT_ZONE \
 	    $NAME
 	  info "Creating network tldr-overlay"
 	  docker $(docker-machine config $NAME) network create --driver overlay tldr-overlay
@@ -143,8 +148,10 @@ function create_swarm_node() {
 	     --engine-opt="log-opt syslog-address=$LOGSTASH" \
 	     $EXTRA_OPTS \
 	     --engine-insecure-registry="$REGISTRY" \
-	     --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" --amazonec2-security-group="$TLDR_NODE_SG_NAME" $NAME
-	  
+	     --amazonec2-ami="$TLDR_DOCKER_MACHINE_AMI" \
+	     --amazonec2-security-group="$TLDR_NODE_SG_NAME" \
+	     --amazonec2-zone $AWS_DEFAULT_ZONE \
+	     $NAME
 	  info "Starting Consul agent"
 	  docker $(docker-machine config $NAME) run -d \
 	         -p 172.17.0.1:53:53 \

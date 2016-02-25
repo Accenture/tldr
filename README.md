@@ -59,11 +59,12 @@ export AWS_ACCESS_KEY_ID=<secret key>
 export AWS_SECRET_ACCESS_KEY=<secret access key>
 export AWS_VPC_ID=<vpc-id>
 export AWS_DEFAULT_REGION=eu-central-1
+export AWS_DEFAULT_ZONE=<zone>
 ```
 
 The values for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY can be obtained from the AWS admin console. 
 
-The value for AWS_VPC_ID will also be available from the console, as the AWS provisioning process creates a VPC called ```tldr-vpc```. Once the AWS provisioning process via Terraform is complete, use the AWS admin console to obtain the id of the ```tldr-vpc```VPC resource, e.g. ```vpc-fe53be97```.
+The value for AWS_VPC_ID and AWS_DEFAULT_ZONE will also be available from the console, as the AWS provisioning process creates a VPC called ```tldr-vpc```. Once the AWS provisioning process via Terraform is complete, use the AWS admin console to obtain the id of the ```tldr-vpc```VPC resource, e.g. ```vpc-fe53be97``` and the respective zone of the VPC subnet e.g. ```b```.
 
 ### Overriding EC2 instance sizes
 
