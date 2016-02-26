@@ -21,7 +21,7 @@ TLDR is not production-ready or enterprise-grade, nor does it intend to be.
 The following are needed to get this environment running:
 
 - Docker Toolbox 1.9.1
-- Docker Machine 0.5.2 or higher if you intend to deploy the platform to Amazon Web Services; the default version from Docker Toolbox 1.9.1 will work just fine with VirtualBox deploymnts but please note that 0.5.2 or higher are not currently part of the Docker Toolbox package!. The latest version from  is available at https://github.com/docker/machine/releases, but version 0.5.5 seemed to crash when dealing with the configuration of security groups upon instance creation.
+- Docker Machine 0.6.0 or higher
 - Bash/Cygwin if running on Windows
 
 When running locally, 8Gb of RAM is the minimum recommended amount of memory in order to comfortably run all components.
@@ -58,11 +58,13 @@ Set the following environment variables with your AWS secrets before running the
 export AWS_ACCESS_KEY_ID=<secret key>
 export AWS_SECRET_ACCESS_KEY=<secret access key>
 export AWS_VPC_ID=<vpc-id>
+export AWS_DEFAULT_REGION=eu-central-1
+export AWS_DEFAULT_ZONE=<zone>
 ```
 
 The values for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY can be obtained from the AWS admin console. 
 
-The value for AWS_VPC_ID will also be available from the console, as the AWS provisioning process creates a VPC called ```tldr-vpc```. Once the AWS provisioning process via Terraform is complete, use the AWS admin console to obtain the id of the ```tldr-vpc```VPC resource, e.g. ```vpc-fe53be97```.
+The value for AWS_VPC_ID and AWS_DEFAULT_ZONE will also be available from the console, as the AWS provisioning process creates a VPC called ```tldr-vpc```. Once the AWS provisioning process via Terraform is complete, use the AWS admin console to obtain the id of the ```tldr-vpc```VPC resource, e.g. ```vpc-fe53be97``` and the respective zone of the VPC subnet e.g. ```b```.
 
 ### Overriding EC2 instance sizes
 

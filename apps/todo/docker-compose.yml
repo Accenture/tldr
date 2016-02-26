@@ -56,8 +56,9 @@ backend_lb:
  ports:
   - 80:80
   - 1936:1936
+# bind to the local Consul agent
  command:
-  "-consul=tldr-swarm-0-consul:8500"
+   "-consul=172.17.0.1:8500"
 
 # 
 # Frontend load balancer
@@ -77,8 +78,9 @@ client_lb:
  ports:
   - 80:80
   - 1936:1936
+# bind to the local Consul agent  
  command:
-  "-consul=tldr-swarm-0-consul:8500"
+   "-consul=172.17.0.1:8500"
 
 #
 # Frontend nginx

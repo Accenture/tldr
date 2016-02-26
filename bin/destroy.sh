@@ -14,22 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-TLDR_ROOT=$(dirname ${BASH_SOURCE[0]})
+TLDR_ROOT=$(dirname ${BASH_SOURCE[0]})/..
 TLDR_BIN=$TLDR_ROOT/bin
 source $TLDR_BIN/utils.sh
 
-function main() {
-	./bin/createRegistryNode.sh
-	./bin/createInfraNode.sh
-	./bin/createSwarmNode.sh 0
-	./bin/createSwarmNode.sh 1 frontend
-	./bin/createSwarmNode.sh 2 application
-}
+detect_provider
+info "Using provider: ${TLDR_PROVIDER}"
+source $TLDR_BIN/providers/$TLDR_PROVIDER/provider.sh
 
-# redirect all script output to a file, for troubleshooting purposes, as well as to the screen
-main "$@" 2>&1 | tee log.txt
-
-info "***"
-info "Process complete. Run info.sh to get the list of accessible URLs."
-info "See the instructions under apps/todo/README.md to deploy the sample application."
-info "***"
+destroy_instances
