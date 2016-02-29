@@ -91,14 +91,15 @@ See README.md under apps/todo/ for more information.
 
 TLDR is licensed under the Apache 2.0 license and issues and contributions are more than welcome.
 
+# Releases
+
+[Release 1.0](https://github.com/accenture/tldr/issues?q=is%3Aissue+milestone%3A1.0+is%3Aclosed)
+
 # TODO
 
-- Add more checks for partially running environment
 - Add the ability to customize the AMI image for AWS
-- Migrate from Logspout to Docker logging via syslog
 - Create a separate network for the application containers
 - Do not run with an insecure registry
-- Integrate support for logging and monitoring (ELK and Prometheus are there, but not properly integrated yet)
 
 # Known issues
 
