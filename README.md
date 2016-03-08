@@ -68,7 +68,7 @@ The value for AWS_VPC_ID and AWS_DEFAULT_ZONE will also be available from the co
 
 ### Overriding EC2 instance sizes
 
-Additionally, teh following environment variables can be used to override some of the default values used for EC2 instances:
+Additionally, the following environment variables can be used to override some of the default values used for EC2 instances:
 
 ```
 AWS_INSTANCE_TYPE=t2.micro
@@ -87,20 +87,16 @@ export TLDR_DOCKER_MACHINE_AMI=ami-xxxxx
 
 See README.md under apps/todo/ for more information.
 
+# Reporting issues
+
+Use [TLDR's Github issue page](https://github.com/Accenture/tldr/issues) to report issues related to TLDR or any of its components. Do not report issues in subprojects as that would become a nightmare to main and we'd rather keep issues and contributions centralized.
+
+When reporting an issue, please paste the contents of your *log.txt* file into the issue for our reference (this file is created automatically by start.sh). If you used the individual scripts that are under bin/ instead, please paste the output of your screen.
+
 # Contributing
 
-TLDR is licensed under the Apache 2.0 license and issues and contributions are more than welcome.
+TLDR is licensed under the Apache 2.0 license. Pull requests with contributions are more than welcome.
 
-# TODO
+# TODO, Known issues
 
-- Add more checks for partially running environment
-- Add the ability to customize the AMI image for AWS
-- Migrate from Logspout to Docker logging via syslog
-- Create a separate network for the application containers
-- Do not run with an insecure registry
-- Integrate support for logging and monitoring (ELK and Prometheus are there, but not properly integrated yet)
-
-# Known issues
-
-- Can't mark TODOs for completion or delete them
-- The Registrator container is currently an unofficial fork that implements an unmerged PR to support overlay internal IP addresses for containers, as opposed to host IP addresses. This is fine for now but we should keep an eye on upstream Registrator and switch back to it when the PR is merged.
+Please see the [list of open issues](https://github.com/Accenture/tldr/issues) for more details.
