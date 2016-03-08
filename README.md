@@ -97,6 +97,10 @@ When reporting an issue, please paste the contents of your *log.txt* file into t
 
 TLDR is licensed under the Apache 2.0 license. Pull requests with contributions are more than welcome.
 
+# Releases
+
+[Release 1.0](https://github.com/accenture/tldr/issues?q=is%3Aissue+milestone%3A1.0+is%3Aclosed)
+
 # TODO, Known issues
 
 Please see the [list of open issues](https://github.com/Accenture/tldr/issues) for more details.
