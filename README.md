@@ -85,7 +85,7 @@ export TLDR_DOCKER_MACHINE_AMI=ami-xxxxx
 
 # Reference applications
 
-See the [ToDo demo application](apps/todo/README.md) for more information.
+See the [ToDo demo application](apps/todo/) for more information.
 
 # Reporting issues
 
