@@ -1,4 +1,5 @@
-# The Lightweight Docker Runtime (TLDR)
+# The Lightweight Docker Runtime (TLDR) 
+How to deploy in Azure Cloud Provider
 
 # General
 
@@ -34,60 +35,95 @@ Use script ```start.sh``` to set up the Docker Swarm platform and technical comp
 
 Once the process is complete, run ```info.sh``` to provide a list of the available endpoints for inspection.
 
-## Setting up in AWS
+## Setting up in Azure
+Requirements: docker-machine, docker-compose, Terraform, Git, TLDR project
 
-TLDR is supported on AWS when running in region *eu-central-1*, and provides a process for provisioning AWS resources as well as deploying the platform components.
+Summarized steps: 
+	1 Prepare your Linux box by installing docker-machine, docker-compose, Terraform and Git application. 
+	2 Configure your Azure parameters.
+	3 Git clone the tldr project.
+	4 Run the terraform.tf script to deploy infrastructure: 5 VMs
+	5 Check your Swarm cluster is working fine and all hosts are accessible via docker-machine
+	6  Run start.sh script
+	7 Make the Swarm master node the active one
+	8 Deploy application via docker-compose
 
-The platform is very likely to work in other regions, but please see "Running in a region that is not eu-central-1" below for the time being until the provisioning process is improved to take other regions into account.
+Requirements
+1 Linux instance
+Use your own one, no matter if it is a bare metal, VirtualBox, Amazon hosted, etc. In our example we will use an Amazon Linux VM.
 
-### Setting up AWS resources
+2 Azure Account
+Please note this first release it is only available for Azure Service Management, most likely we´ll release one for Azure Resource Manager soon.
 
-First, a set of Amazon AWS resources will be provisioned to host the platform: a VPC, with a subnet, routing tables and an internet gateway. This is to keep the platform separated from any other AWS resources that may currently be in use.
+3 Docker engine, quick installation guide:
+   Update packages first:
+   [ec2-user ~]$ sudo yum update -y
+   Install docker
+   [ec2-user ~]$ sudo yum install -y docker
+   Start the docker service 
+   [ec2-user ~]$ sudo service docker start
+     Starting cgconfig service:                        [  OK  ]
+     Starting docker:	                                 [  OK  ]
+   Add your user to the docker group:
+   [ec2-user ~]$ sudo usermod -a -G docker ec2-user
+4 Docker-machine, quick installation:
+   Download the right binary, for a 64 bits Linux this is the right one: 
+   [ec2-user ~]$ curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` > /usr/local/bin/docker-machine && \
+   chmod +x /usr/local/bin/docker-machine
+   In case of errors perform the operation in your user directory and then copy docker-machine binary to /usr/local/bin
+5 Docker-compose
+  [ec2-user ~]$ curl -L https://github.com/docker/compose/releases/download/1.7.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+  chmod +x /usr/local/bin/docker-compose
+Note
+In case of permission issues copy the binary to your local folder and then move it to /usr/local/bin, please verify your user .bashrc file to double check that location is already added to your PATH envirnonment variable
 
-Provisioning of AWS resources is handled via Terraform, please see provisioning/aws/README.md for detailed steps.
+6 Azure
+  •	It is requiered to add your Linux an environment variable
+  $AZURE_SUBSCRIPTION_ID
+  •	Please get your Azure Publish Settings file, something you can do by running the following Azure powershell command:
+		Get-AzurePublishSettingsFile
+	More information https://msdn.microsoft.com/en-us/library/dn385850(v=nav.70).aspx
+7 Private/Public SSH key
+You will need to use public/private keys with docker-machine combined with the generic driver, when discovering nodes generic driver relies on user and SSH keys, let quickly remind how to perform this operation. Once in your Linux box please run the following commands:
+[ec2-user ~]ssh-keygen -t rsa
+Accept default options, your public key will be saved in your user .ssh/id_rsa.pub file, while the private part will be found in /home/”youruser”/.ssh/id_rsa.pub
+8 Terraform
+Copy the Terraform binary and unzip it, you might do it in /usr/bin which usually is in your Linux path (environment variable).
+[ec2-user ~]$ wget https://releases.hashicorp.com/terraform/0.6.15/terraform_0.6.15_linux_amd64.zip
+[ec2-user ~]$ unzip terraform_0.6.15_linux_amd64.zip
+Terraform requires de credentials.publishingsettings file to connect properly to the Azure account where you want to deploy your TLDR infrastructure.
+9 Git
+Run the following command to install git tool. Please realize this example shows the action through yum tool, if you are working on a Debian based as Ubuntu please use apt-get instead.
+[ec2-user ~]$ sudo yum –y install git
+10 TLDR
+Get the TLDR repository and perform the clone into your local folder:
+[ec2-user ~]$ git clone https://github.com/Accenture/tldr.git
 
-### Provisioning the components
+Deploying infrastructure in Azure
+Let´s start deploying infrastructure, go to the tldr folder and look for the Azure one inside provisioning, you should find a terraform.tf script.
+[ec2-user ~]$ cd tldr/provisioning/azure/
 
-Please note that Docker Machine 0.5.2 or higher is needed, otherwise the process will not work.
-
-Once the AWS resources have been provisioned, the TLDR platfomr can be deployed.
-
-Set the following environment variables with your AWS secrets before running the start.sh script:
-
-```
-export AWS_ACCESS_KEY_ID=<secret key>
-export AWS_SECRET_ACCESS_KEY=<secret access key>
-export AWS_VPC_ID=<vpc-id>
-export AWS_DEFAULT_REGION=eu-central-1
-export AWS_DEFAULT_ZONE=<zone>
-```
-
-The values for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY can be obtained from the AWS admin console. 
-
-The value for AWS_VPC_ID and AWS_DEFAULT_ZONE will also be available from the console, as the AWS provisioning process creates a VPC called ```tldr-vpc```. Once the AWS provisioning process via Terraform is complete, use the AWS admin console to obtain the id of the ```tldr-vpc```VPC resource, e.g. ```vpc-fe53be97``` and the respective zone of the VPC subnet e.g. ```b```.
-
-### Overriding EC2 instance sizes
-
-Additionally, the following environment variables can be used to override some of the default values used for EC2 instances:
-
-```
-AWS_INSTANCE_TYPE=t2.micro
-AWS_ROOT_SIZE=16
-```
-
-### Running in a region that is not eu-central-1
-
-At the moment the AMI image for Ubuntu 15.10 is hardcoded as ami-fe001292 and *only works in region eu-central-1*. If you are running in a region that is not eu-west-1, find out the id of the Ubuntu 15.10 image for your region and expose it as an environment variable:
-
-```
-export TLDR_DOCKER_MACHINE_AMI=ami-xxxxx
-```
-
-# Reference applications
-
-See the [ToDo demo application](apps/todo/) for more information.
-
-# Reporting issues
+Some required changes (aka “tunning”)
+Terraform script is configured with a specific key combination for a specific user, in this example ec2-user, change this values in each “provisioner “local exec” section by changing ec2-user for yours.
+Copy your public/private key combination you generated before to this folder, it should be located at /home/youruser/.ssh/
+  provisioner file {
+        source = "/home/ec2-user/.ssh/id_rsa.pub"
+        destination = "/home/azureuser/.ssh/authorized_keys"
+   }     
+To run the script just type:
+[ec2-user ~]$ terraform plan
+which will show you what the script is going to do, in order to execute, please type:
+[ec2-user ~]$ terraform apply
+Now double check by running docker-machine ls to verify swarm cluster is perfectly built up. See below screenshot.
+Configuring the Registry, deploying monitoring tools
+1 Go to tldr folder and run start.sh script, do not forget to set the Azure_ID environment variable or that script won´t be able to discern the cloud provider destination.
+[ec2-user ~]$ ./start.sh
+Now point to the node-0, meaning making that node the active one where deploy the application
+[ec2-user@ip-172-31-13-65 todo]$ eval $(docker-machine env --swarm tldr-swarm-azure-0)
+Verify node 0 is the active one by running docker-machine ls, or just type docker info to check you are located on the master
+Now change directory to the /tldr/apps/todo folder where the compose YML file is located at:
+Please run the application:
+[ec2-user@ip-172-31-13-65 todo]$ docker-compose up –d
 
 Use [TLDR's Github issue page](https://github.com/Accenture/tldr/issues) to report issues related to TLDR or any of its components. Do not report issues in subprojects as that would become a nightmare to main and we'd rather keep issues and contributions centralized.
 
