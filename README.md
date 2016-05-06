@@ -85,22 +85,30 @@ In case of permission issues copy the binary to your local folder and then move 
 	More information https://msdn.microsoft.com/en-us/library/dn385850(v=nav.70).aspx
 7 Private/Public SSH key
 You will need to use public/private keys with docker-machine combined with the generic driver, when discovering nodes generic driver relies on user and SSH keys, let quickly remind how to perform this operation. Once in your Linux box please run the following commands:
+
 [ec2-user ~]ssh-keygen -t rsa
 Accept default options, your public key will be saved in your user .ssh/id_rsa.pub file, while the private part will be found in /home/”youruser”/.ssh/id_rsa.pub
+
 8 Terraform
 Copy the Terraform binary and unzip it, you might do it in /usr/bin which usually is in your Linux path (environment variable).
+
 [ec2-user ~]$ wget https://releases.hashicorp.com/terraform/0.6.15/terraform_0.6.15_linux_amd64.zip
 [ec2-user ~]$ unzip terraform_0.6.15_linux_amd64.zip
+
 Terraform requires de credentials.publishingsettings file to connect properly to the Azure account where you want to deploy your TLDR infrastructure.
+
 9 Git
 Run the following command to install git tool. Please realize this example shows the action through yum tool, if you are working on a Debian based as Ubuntu please use apt-get instead.
+
 [ec2-user ~]$ sudo yum –y install git
+
 10 TLDR
 Get the TLDR repository and perform the clone into your local folder:
 [ec2-user ~]$ git clone https://github.com/Accenture/tldr.git
 
 Deploying infrastructure in Azure
 Let´s start deploying infrastructure, go to the tldr folder and look for the Azure one inside provisioning, you should find a terraform.tf script.
+
 [ec2-user ~]$ cd tldr/provisioning/azure/
 
 Some required changes (aka “tunning”)
@@ -111,17 +119,23 @@ Copy your public/private key combination you generated before to this folder, it
         destination = "/home/azureuser/.ssh/authorized_keys"
    }     
 To run the script just type:
+
 [ec2-user ~]$ terraform plan
 which will show you what the script is going to do, in order to execute, please type:
+
 [ec2-user ~]$ terraform apply
 Now double check by running docker-machine ls to verify swarm cluster is perfectly built up. See below screenshot.
+
 Configuring the Registry, deploying monitoring tools
 1 Go to tldr folder and run start.sh script, do not forget to set the Azure_ID environment variable or that script won´t be able to discern the cloud provider destination.
+
 [ec2-user ~]$ ./start.sh
 Now point to the node-0, meaning making that node the active one where deploy the application
+
 [ec2-user@ip-172-31-13-65 todo]$ eval $(docker-machine env --swarm tldr-swarm-azure-0)
 Verify node 0 is the active one by running docker-machine ls, or just type docker info to check you are located on the master
 Now change directory to the /tldr/apps/todo folder where the compose YML file is located at:
+
 Please run the application:
 [ec2-user@ip-172-31-13-65 todo]$ docker-compose up –d
 
