@@ -31,6 +31,8 @@ source $TLDR_BIN/providers/$TLDR_PROVIDER/provider.sh
 create_registry_node
 
 info "Caching images in the private registry"
+#TEMP
+info "using registry ${REGISTRY_IP}"
 
 info "Caching Consul image"
 docker pull progrium/consul
