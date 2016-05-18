@@ -9,9 +9,9 @@ TLDR is not production-ready or enterprise-grade, nor does it intend to be.
 # Features
 
 - Docker Machine to provision a cluster, either locally via VirtualBox or on Amazon AWS
-- 3-node Docker Swarm cluster
+- 3-node Docker Swarm cluster (easily expandable to more nodes)
 - Dynamic service discovery and registration using Consul and Registrator
-- Deployment of applications via Docker Compose
+- Deployment of applications via Docker Compose and overlay networks
 - Transparent application container load balancing using the tldr/alb container, which provides seamless scaling of application containers within the Swarm cluster
 - Log aggregation via Logspout, ElasticSearch, Kibana and Logstash 
 - Monitoring and metrics via Prometheus and cAdvisor
@@ -85,7 +85,7 @@ export TLDR_DOCKER_MACHINE_AMI=ami-xxxxx
 
 # Reference applications
 
-See README.md under apps/todo/ for more information.
+See the [ToDo demo application](apps/todo/) for more information.
 
 # Reporting issues
 
