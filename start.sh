@@ -22,8 +22,8 @@ function main() {
 	./bin/createRegistryNode.sh
 	./bin/createInfraNode.sh
 	./bin/createSwarmNode.sh 0
-	./bin/createSwarmNode.sh 1 frontend
-	./bin/createSwarmNode.sh 2 application
+#	./bin/createSwarmNode.sh 1 frontend
+#	./bin/createSwarmNode.sh 2 application
 }
 
 # redirect all script output to a file, for troubleshooting purposes, as well as to the screen

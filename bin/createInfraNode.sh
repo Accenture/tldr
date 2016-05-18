@@ -19,7 +19,10 @@
 TLDR_ROOT=$(dirname ${BASH_SOURCE[0]})/..
 TLDR_BIN=$TLDR_ROOT/bin
 source $TLDR_BIN/utils.sh
-
+#TEMP 
+echo ${TLDR_ROOT}
+echo ${TLDR_BIN}
+#TEMP
 print "Setting up infra"
 
 # Creates infra node if needed
@@ -70,3 +73,4 @@ if [ "$(container_status registrator)" != "running" ]; then
   error "Registrator was not successfully started."
   exit 1
 fi
+
